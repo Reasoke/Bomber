@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.33502.453
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Task1", "Task1.csproj", "{881BE30C-5453-4DB7-9AD7-EE6F16C5F152}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Game.Console", "..\Game.Console\Game.Console.csproj", "{DA8E7267-A902-4586-85A8-F4876824BB74}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Game.Engine", "..\Game.Engine\Game.Engine.csproj", "{D3D5EF01-C76B-40DF-99FF-053E29D2EB88}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{881BE30C-5453-4DB7-9AD7-EE6F16C5F152}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{881BE30C-5453-4DB7-9AD7-EE6F16C5F152}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{881BE30C-5453-4DB7-9AD7-EE6F16C5F152}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{881BE30C-5453-4DB7-9AD7-EE6F16C5F152}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DA8E7267-A902-4586-85A8-F4876824BB74}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DA8E7267-A902-4586-85A8-F4876824BB74}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DA8E7267-A902-4586-85A8-F4876824BB74}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DA8E7267-A902-4586-85A8-F4876824BB74}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D3D5EF01-C76B-40DF-99FF-053E29D2EB88}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D3D5EF01-C76B-40DF-99FF-053E29D2EB88}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D3D5EF01-C76B-40DF-99FF-053E29D2EB88}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D3D5EF01-C76B-40DF-99FF-053E29D2EB88}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {CE7278CF-2B3E-4999-B083-4BB725AE0C4B}
+	EndGlobalSection
+EndGlobal
