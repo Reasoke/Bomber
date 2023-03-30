@@ -3,9 +3,13 @@
 namespace Ira.Game {
     internal class Program {
         static void Main(string[] args) {
-            //var md = MoveDirection.Down;
+            
+            var game = new GameEngine();
+            game.StartNew();
+
             Console.WriteLine("Game is finished. Press any key to exit.");
             Console.ReadKey();
         }
+
     }
 }

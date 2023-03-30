@@ -1,20 +1,31 @@
-﻿namespace Ira.Game {
+﻿using System;
+
+namespace Ira.Game {
 
     public class GameBoard {
         public int W;
         public int H;
-        public EmptyElement[,] map;
+        public EmptyElement[,] Map { get; }
 
         public GameBoard(int w, int h) {
             this.W = w;
             this.H = h;
-            this.map = new EmptyElement[W, H];
+            this.Map = new EmptyElement[W, H];
+        }
+
+        public EmptyElement this[int x, int y] {
+            get {
+                return Map[x, y];
+            }
+            set {
+                Map[x, y] = value;
+            }
         }
     }
 
-    public abstract class EmptyElement {
-        public int X { get; }
-        public int Y { get; }
+    public class EmptyElement {
+        public int X { get; private set; }
+        public int Y { get;private set;}
         public bool IsMovable { get; protected set; }
         public bool IsBarrier { get; }
 
@@ -25,9 +36,25 @@
             this.IsMovable = false;
         }
 
-        public virtual void Move() {
+        public virtual void Move(MoveDirection direction) {
             if (IsBarrier || !IsMovable) return;
-            //todo: change X and Y
+            switch (direction) {
+                case MoveDirection.None:
+                    //stay here
+                    break;
+                case MoveDirection.Up:
+                    this.Y--;
+                    break;
+                case MoveDirection.Right:
+                    this.X++;
+                    break;
+                case MoveDirection.Down:
+                    this.Y++;
+                    break;
+                case MoveDirection.Left:
+                    this.X--;
+                    break;
+            }
         }
     }
 

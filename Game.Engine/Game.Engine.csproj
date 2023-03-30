@@ -43,7 +43,13 @@
   <ItemGroup>
     <Compile Include="Classes\Elements.cs" />
     <Compile Include="Classes\MoveDirection.cs" />
+    <Compile Include="GameEngine.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="media\Input.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
