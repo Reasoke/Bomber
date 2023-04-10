@@ -1,60 +1,63 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 
 namespace Ira.Game {
     public class GameEngine {
-
-        private string title = "Bomberfox";
+        private readonly IPainter painter;
+        
         //private Finish finish;
         private Player player;
         private readonly List<Enemy> enemies = new List<Enemy>();
 
         private GameBoard board;
-        private int width;
-        private int height;
-        
+
+        public GameEngine(IPainter painter) {
+            this.painter = painter;
+        }
+
         public void StartNew() {
             
             Read_Data();
-            DrawBoard();
-
+            painter.DrawBoard(board, player, enemies);
 
             Console.Write("Нажмите Enter для начала игры: ");
             Console.ReadLine();
+            Console.CursorVisible = false;
             PlayTheGame();
         }
 
         private void PlayTheGame() {
-            DrawBoard();
-            Console.CursorVisible = false;
+            painter.DrawBoard(board, player, enemies);
             while (true) {
                 var key = Console.ReadKey(true);
                 switch (key.Key) {
                     case ConsoleKey.UpArrow:
-                            player.MoveDirection = MoveDirection.Up;
+                        player.MoveDirection = MoveDirection.Up;
                         break;
                     case ConsoleKey.DownArrow:
-                            player.MoveDirection = MoveDirection.Down;
+                        player.MoveDirection = MoveDirection.Down;
                         break;
                     case ConsoleKey.RightArrow:
-                            player.MoveDirection = MoveDirection.Right;
+                        player.MoveDirection = MoveDirection.Right;
                         break;
                     case ConsoleKey.LeftArrow:
-                            player.MoveDirection = MoveDirection.Left;
+                        player.MoveDirection = MoveDirection.Left;
+                        break;
+                    case ConsoleKey.Spacebar:
+                        player.SetTheBomb(board);
                         break;
                     case ConsoleKey.Escape:
                         return;
                 }
-                
+
                 player.Move();
                 foreach (var e in enemies) {
                     e.Move();
                 }
                 player.InteractWithBoard(board, enemies);
                 
-                DrawBoard();
+                painter.DrawBoard(board, player, enemies);
                 
                 while (Console.KeyAvailable) {
                     Console.ReadKey(true);
@@ -65,8 +68,8 @@ namespace Ira.Game {
         private void Read_Data() {
             var fileName = ".\\media\\Input.txt";
             var fileLines = File.ReadAllLines(fileName);
-            height = fileLines.Length;
-            width = Get_Max_Length(fileLines);
+            var height = fileLines.Length;
+            var width = Get_Max_Length(fileLines);
 
             board = new GameBoard(width, height);
             for (int y = 0; y < height; y++) { // перебираем все файловые строки
@@ -83,7 +86,7 @@ namespace Ira.Game {
                             break;
 
                         case ' ':
-                            board[x, y] = new EmptyElement();
+                            board[x, y] = null;
                             break;
                         case 'C':
                             board[x, y] = new Coins();
@@ -95,7 +98,7 @@ namespace Ira.Game {
 
                         case 'E':
                             var enemy = new Enemy(x, y, board);
-                            board[x, y] = new EmptyElement();
+                            board[x, y] = null;
                             enemies.Add(enemy);
                             break;
 
@@ -103,7 +106,7 @@ namespace Ira.Game {
                             if (player != null) {
                                 throw new Exception("ERROR: Игррок уже существует.");
                             }
-                            board[x, y] = new EmptyElement();
+                            board[x, y] = null;
                             player = new Player(x, y, board, 3);
                             break;
                     }
@@ -133,107 +136,6 @@ namespace Ira.Game {
 
             return result;
         }
-        
-        private void DrawBoard() {
-            Console.Clear();
-            Console.Title = $"{title} (player position: {player.X} - {player.Y}) Player Score: {player.Score} Player Lives: {player.LivesCount}";
-
-
-            for (int y = 0; y < height; y++) {
-                Console.Write("\t");
-                for (int x = 0; x < width; x++) {
-                    string output;
-                    switch (board[x, y]) {
-                        case PermanentWall el: {
-                            var w_up = y - 1 >= 0 && board[x, y - 1] is PermanentWall; // array[x, y - 1] == Wall - сравнение
-                            var w_down = y + 1 < height && board[x, y + 1] is PermanentWall;
-                            var w_left = x - 1 >= 0 && board[x - 1, y] is PermanentWall;
-                            var w_right = x + 1 < width && board[x + 1, y] is PermanentWall;
-
-
-                            if (w_up && w_down && w_left && w_right) {
-                                output = "┼";
-                            }
-                            else if (w_up && w_down && w_left) {
-                                output = "┤";
-                            }
-                            else if (w_up && w_down && w_right) {
-                                output = "├";
-                            }
-                            else if (w_up && w_down) {
-                                output = "│";
-                            }
-                            else if (w_up && w_left && w_right) {
-                                output = "┴";
-                            }
-                            else if (w_up && w_left) {
-                                output = "┘";
-                            }
-                            else if (w_up && w_right) {
-                                output = "└";
-                            }
-                            else if (w_up) {
-                                output = "│";
-                            }
-                            else if (w_down && w_left && w_right) {
-                                output = "┬";
-                            }
-                            else if (w_down && w_left) {
-                                output = "┐";
-                            }
-                            else if (w_down && w_right) {
-                                output = "┌";
-                            }
-                            else if (w_down) {
-                                output = "│";
-                            }
-                            else if (w_left && w_right) {
-                                output = "─";
-                            }
-                            else if (w_left) {
-                                output = "─";
-                            }
-                            else if (w_right) {
-                                output = "─";
-                            }
-                            else {
-                                output = "■";
-                            }
-
-                            //output = "┐ └ ┘ ┌ ┴ ┬ ┤ ├ │ ─ ┼ ■ ° ∙ ░";
-                            break;
-                        }                            
-                     
-                        case CrumblingWall el:
-                            output = "░";  
-                            break;
-                        
-                        case Coins c:
-                            output = "@";
-                            break;
-                        case EmptyElement el:
-                        default:
-                            if (enemies.Any(e=>e.X == x && e.Y == y)) {
-                                output = "E";
-                            }
-                            else if (x == player.X && y == player.Y) {
-                                output = "P";
-                            }else if (board[x, y] is Finish) {
-                                output = "F";
-                            }
-                            else {
-                                output = " ";
-                            }
-                            break;
-                    }
-
-                    Console.Write(output);
-                }
-                Console.WriteLine();
-            }
-            Console.WriteLine();
-        }
-        
         
     }
 }

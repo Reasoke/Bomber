@@ -1,35 +1,32 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Drawing;
 
 namespace Ira.Game {
-
+    
     public class GameBoard {
         public int Width;
         public int Height;
-        public EmptyElement[,] Map { get; }
+        public BaseElement[,] Map { get; }
 
         public GameBoard(int w, int h) {
             this.Width = w;
             this.Height = h;
-            this.Map = new EmptyElement[Width, Height];
+            this.Map = new BaseElement[Width, Height];
         }
 
-        public EmptyElement this[int x, int y] {
-            get {
-                return Map[x, y];
-            }
-            set {
-                Map[x, y] = value;
-            }
+        public BaseElement this[int x, int y] {
+            get { return Map[x, y]; }
+            set { Map[x, y] = value; }
         }
     }
 
-    public class EmptyElement {
+    public abstract class BaseElement {
         public bool IsMovable { get; protected set; }
         public bool IsBarrier { get; }
 
-        public EmptyElement(bool isBarrier = false) {
+        public BaseElement(bool isBarrier = false) {
             this.IsBarrier = isBarrier;
             this.IsMovable = false;
         }
@@ -41,7 +38,7 @@ namespace Ira.Game {
 
     #region Character
 
-    public class Character : EmptyElement {
+    public class Character : BaseElement {
         protected readonly GameBoard board;
         public int Score = 0;
 
@@ -63,7 +60,7 @@ namespace Ira.Game {
         }
 
         protected bool CanMoveTo(int x, int y) {
-            if (x >= 0 && x < board.Width && y >= 0 && y < board.Height && !board[x, y].IsBarrier) {
+            if (x >= 0 && x < board.Width && y >= 0 && y < board.Height && (board[x, y] == null || !board[x, y].IsBarrier)) {
                 return true;
             }
 
@@ -73,12 +70,28 @@ namespace Ira.Game {
     }
 
     public class Player : Character {
-
+        private readonly Point respawnPoint;
+        
+        public int BombPower { get; private set; }
+        public int BombsLimit { get; private set; }
+        public int BombsUsed { get; private set; }
         public MoveDirection MoveDirection { get; set; }
+        
         public Player(int x, int y, GameBoard board, int lives) : base(x, y, board, lives) {
             LivesCount = lives;
+            BombsUsed = 0;
+            respawnPoint.X = x;
+            respawnPoint.Y = y;
+            SetDefaults();
         }
 
+        private void SetDefaults() {
+            BombsLimit = 1;
+            BombPower = 2;
+            X = respawnPoint.X;
+            Y = respawnPoint.Y;
+        }
+        
         public override void Move() {
             switch (MoveDirection) {
                 case MoveDirection.None:
@@ -104,24 +117,38 @@ namespace Ira.Game {
             MoveDirection = MoveDirection.None;
         }
 
-        public void InteractWithBoard(GameBoard board, List<Enemy> enemies) {
-            switch (board[X, Y]) {
-                case BaseItem b: {
-                        if (b.IsCollectable) {
-                            this.Score++;
-                            board[X, Y] = new EmptyElement();
-                        }
-                        break;
-                    }
-                case Finish f: {
-                        if (f.ExitMode) {
-                            //exit to next level or exit game
-                        }
-                        break;
-                    }
-            }
+        public void SetTheBomb(GameBoard board) {
+            if (BombsUsed >= BombsLimit || board[X, Y] != null) return;
+            BombsUsed++;
+            board[X, Y] = new Bomb(BombPower);
+        }
 
-            if (enemies.Any(e => e.X == X && e.Y == Y)) {
+       public void InteractWithBoard(GameBoard board, List<Enemy> enemies) {
+           switch (board[X, Y]) {
+               case Coins c: {
+                   this.Score++;
+                   board[X, Y] = null;
+                   break;
+               }
+               case BombCountBonus c: {
+                   this.BombsLimit++;
+                   board[X, Y] = null;
+                   break;
+               }
+               case BombPowerBonus c: {
+                   this.BombPower++;
+                   board[X, Y] = null;
+                   break;
+               }
+               case Finish f: {
+                   if (f.ExitMode) {
+                       //exit to next level or exit game
+                   }
+                   break;
+               }
+           }
+
+           if (enemies.Any(e => e.X == X && e.Y == Y)) {
                 this.LivesCount--;
                 //todo: pause + resspawn player at the begining(no enemies)
             }
@@ -177,7 +204,7 @@ namespace Ira.Game {
 
     #endregion
 
-    public class Finish : EmptyElement {
+    public class Finish : BaseElement {
         public bool ExitMode = false;
         public Finish() : base() {
         }
@@ -185,7 +212,7 @@ namespace Ira.Game {
 
     #region Walls
 
-    public class Wall : EmptyElement {
+    public class Wall : BaseElement {
         public bool IsBreakable { get; }
 
         public Wall(bool isBreakable = false) : base(isBarrier: true) {
@@ -207,7 +234,7 @@ namespace Ira.Game {
 
     #region Items
 
-    public class BaseItem : EmptyElement {
+    public class BaseItem : BaseElement {
         public bool IsCollectable { get; }
         public BaseItem(bool isBarrier, bool isCollectable) : base(isBarrier) {
             this.IsCollectable = isCollectable;
@@ -219,8 +246,27 @@ namespace Ira.Game {
         }
     }
 
+    public class BombCountBonus : BaseItem {
+        public BombCountBonus() : base(isBarrier: false, isCollectable: true) {
+        }
+    }
+    
+    public class BombPowerBonus : BaseItem {
+        public BombPowerBonus() : base(isBarrier: false, isCollectable: true) {
+        }
+    }
+
     public class Bomb : BaseItem {
-        public Bomb() : base(isBarrier: true, isCollectable: false) {
+        public int Power { get; }
+        public int Ticks { get; private set; }
+
+        public Bomb(int power) : base(isBarrier: true, isCollectable: false) {
+            Power = power;
+            Ticks = 5;
+        }
+
+        public void Tick() {
+            Ticks--;
         }
     }
 
