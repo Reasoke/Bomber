@@ -8,8 +8,17 @@ namespace Ira.Game {
     
     private const string Title = "Bomberfox";
 
-    public void DrawBoard(GameBoard board, Player player, List<Enemy> enemies) {
+    public Painter() {
+      Console.CursorVisible = false;
+    }
+
+    public void Clear() {
       Console.Clear();
+    }
+
+    public void DrawBoard(GameBoard board, Player player, List<Enemy> enemies) {
+      Console.SetCursorPosition(0,0);
+      
       Console.Title = $"{Title} (player position: {player.X} - {player.Y}) Player Score: {player.Score} Player Lives: {player.LivesCount}";
 
       for (var y = 0; y < board.Height; y++) {
@@ -78,21 +87,27 @@ namespace Ira.Game {
             }
 
             case CrumblingWall el:
-              ColorConsole.Write("░", ConsoleColor.DarkCyan);
+              ColorConsole.Write("░", ConsoleColor.DarkYellow);
               break;
 
             case Coins c:
               ColorConsole.Write("@", ConsoleColor.Yellow);
               break;
+            case Bomb b:
+                ColorConsole.Write(b.Ticks.ToString(), ConsoleColor.White, ConsoleColor.Red);
+              break;
+            case Fire f:
+                ColorConsole.Write(" ", ConsoleColor.White, ConsoleColor.Red);
+              break;
             default:
               if (enemies.Any(e => e.X == x && e.Y == y)) {
-                ColorConsole.Write("E", ConsoleColor.Red);
+                ColorConsole.Write("E", ConsoleColor.DarkRed);
               }
               else if (x == player.X && y == player.Y) {
                 ColorConsole.Write("P", ConsoleColor.Blue);
               }
-              else if (board[x, y] is Finish) {
-                ColorConsole.Write("F", ConsoleColor.Cyan);
+              else if (board[x, y] is Finish f) {
+                ColorConsole.Write("F", f.ExitMode ? ConsoleColor.Yellow : ConsoleColor.Green, f.ExitMode ? ConsoleColor.Blue : ConsoleColor.Black);
               }
               else {
                 ColorConsole.Write(" ");
@@ -107,5 +122,48 @@ namespace Ira.Game {
 
       ColorConsole.WriteLine();
     }
+
+    public void DrawStartScreen() {
+    }
+
+    public void DrawWinScreen() {
+    }
+
+    public void DrawDieScreen() {
+    }
+
+    // public void DrawEndScreen() {
+    //   // Console.Clear();
+    //   Console.Title = $"{Title}";
+    //
+    //   for (var y = 0; y < board.Height; y++) {
+    //     ColorConsole.Write("\t");
+    //     for (var x = 0; x < board.Width; x++) {
+    //       switch (board[x, y]) {
+    //         case PermanentWall el: {
+    //           break;
+    //         }
+    //         case CrumblingWall el:
+    //           ColorConsole.Write("░", ConsoleColor.DarkYellow);
+    //           break;
+    //
+    //         case Coins c:
+    //           ColorConsole.Write("@", ConsoleColor.Yellow);
+    //           break;
+    //         case Bomb b:
+    //             ColorConsole.Write("?", ConsoleColor.Red);
+    //           break;
+    //         default:
+    //           break;
+    //       }
+    //     }
+    //
+    //     ColorConsole.WriteLine();
+    //   }
+    //
+    //   ColorConsole.WriteLine();
+    // }
+    
+    
   }
 }

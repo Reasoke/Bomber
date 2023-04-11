@@ -5,31 +5,38 @@ using System.IO;
 namespace Ira.Game {
     public class GameEngine {
         private readonly IPainter painter;
-        
-        //private Finish finish;
+
+        private Finish finish;
         private Player player;
         private readonly List<Enemy> enemies = new List<Enemy>();
-
         private GameBoard board;
 
         public GameEngine(IPainter painter) {
             this.painter = painter;
         }
 
-        public void StartNew() {
-            
-            Read_Data();
-            painter.DrawBoard(board, player, enemies);
+        public void StartNew(int level = 1) {
 
-            Console.Write("Нажмите Enter для начала игры: ");
-            Console.ReadLine();
-            Console.CursorVisible = false;
-            PlayTheGame();
+            while(level < 6) {
+                Read_Data(level);
+                painter.Clear();
+                painter.DrawBoard(board, player, enemies);//startScreen
+                Console.Write("Нажмите Enter для начала игры: ");
+                Console.ReadLine();
+                if (!PlayTheGame())
+                    break;
+                painter.DrawWinScreen();
+                level++;
+            }
+            painter.DrawDieScreen();
         }
 
-        private void PlayTheGame() {
-            painter.DrawBoard(board, player, enemies);
+        private bool PlayTheGame() {
+            painter.Clear();
             while (true) {
+                painter.DrawBoard(board, player, enemies);
+
+                //keyboard
                 var key = Console.ReadKey(true);
                 switch (key.Key) {
                     case ConsoleKey.UpArrow:
@@ -45,28 +52,41 @@ namespace Ira.Game {
                         player.MoveDirection = MoveDirection.Left;
                         break;
                     case ConsoleKey.Spacebar:
-                        player.SetTheBomb(board);
+                        player.SetTheBomb();
                         break;
                     case ConsoleKey.Escape:
-                        return;
+                        return false;
+                }
+                //Clear keyboard buffer
+                while (Console.KeyAvailable) {
+                    Console.ReadKey(true);
                 }
 
+                //game logic
                 player.Move();
+                board.ProcessElements(player, enemies);
                 foreach (var e in enemies) {
                     e.Move();
                 }
-                player.InteractWithBoard(board, enemies);
-                
-                painter.DrawBoard(board, player, enemies);
-                
-                while (Console.KeyAvailable) {
-                    Console.ReadKey(true);
+                if (enemies.Count == 0) {
+                    finish.ExitMode = true;
+                }
+                player.InteractWithBoard(enemies);
+               
+
+                if (!player.IsAlive) {
+                    return false;
+                }
+
+                if (player.IsWinner) {
+                    player.IsWinner = false;
+                    return true;
                 }
             }
         }
         
-        private void Read_Data() {
-            var fileName = ".\\media\\Input.txt";
+        private void Read_Data(int level) {
+            var fileName = $".\\media\\Level_{level}.txt";
             var fileLines = File.ReadAllLines(fileName);
             var height = fileLines.Length;
             var width = Get_Max_Length(fileLines);
@@ -93,7 +113,7 @@ namespace Ira.Game {
                             break;
 
                         case 'F':                           
-                            board[x, y]= new Finish();
+                            board[x, y]= finish = new Finish();
                             break;
 
                         case 'E':
@@ -103,11 +123,15 @@ namespace Ira.Game {
                             break;
 
                         case 'P':
-                            if (player != null) {
-                                throw new Exception("ERROR: Игррок уже существует.");
+                            if (player == null) {
+                                player = new Player(x, y, board, 3);
                             }
+                            else {
+                                player.SetRespawnLocation(x,y,board);
+                                // throw new Exception("ERROR: Игррок уже существует.");
+                            }
+
                             board[x, y] = null;
-                            player = new Player(x, y, board, 3);
                             break;
                     }
                 }

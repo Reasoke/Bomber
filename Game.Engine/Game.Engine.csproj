@@ -42,16 +42,36 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Classes\BaseElement.cs" />
+    <Compile Include="Classes\Character.cs" />
     <Compile Include="Classes\Elements.cs" />
+    <Compile Include="Classes\Enemy.cs" />
+    <Compile Include="Classes\GameBoard.cs" />
     <Compile Include="Classes\IPainter.cs" />
     <Compile Include="Classes\MoveDirection.cs" />
+    <Compile Include="Classes\Player.cs" />
     <Compile Include="GameEngine.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="media\Input.txt">
+    <Content Include="media\DieScreen.txt" />
+    <Content Include="media\Level_1.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="media\Level_2.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="media\Level_3.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="media\Level_4.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="media\Level_5.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="media\StartScreen.txt" />
+    <Content Include="media\WinScreen.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
