@@ -43,26 +43,29 @@ namespace Ira.Game {
         case MoveDirection.Up:
           if (CanMoveTo(X, Y - 1)) {
             this.Y--;
+            Utils.Play_Sound_Move();
           }
 
           break;
         case MoveDirection.Right:
           if (CanMoveTo(X + 1, Y)) {
             this.X++;
+            Utils.Play_Sound_Move();
           }
 
           break;
         case MoveDirection.Down:
           if (CanMoveTo(X, Y + 1)) {
             this.Y++;
+            Utils.Play_Sound_Move();
           }
 
           break;
         case MoveDirection.Left:
           if (CanMoveTo(X - 1, Y)) {
             this.X--;
+            Utils.Play_Sound_Move();
           }
-
           break;
       }
 
@@ -76,7 +79,7 @@ namespace Ira.Game {
       }
     }
 
-    public void InteractWithBoard(List<Enemy> enemies) {
+    public void InteractWithBoard(List<Enemy> enemies){
       switch (board[X, Y]) {
         case Coins c: {
           this.Score++;
@@ -105,7 +108,11 @@ namespace Ira.Game {
           break;
         }
         case Fire f: {
-          this.Die();
+          if(!IsProtected) this.Die();
+          break;
+        }
+        case Trap t: {
+          if(!IsProtected) this.Die();
           break;
         }
       }
@@ -124,6 +131,7 @@ namespace Ira.Game {
 
     public bool Die() {
       LivesCount--;
+      Utils.Play_Sound_Kill();
       if (IsAlive) {
         SetDefaults();
         return false;

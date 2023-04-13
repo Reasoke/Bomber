@@ -75,7 +75,18 @@
 
     public class Fire : BaseItem {
         public int StepNumber { get; set; }
-        public Fire() : base(isBarrier: false, isCollectable: false) {
+        public Fire(int stepNumber) : base(isBarrier: false, isCollectable: false) {
+            StepNumber = stepNumber;
+        }
+    }
+    
+    public class Trap : BaseItem {
+        public int StepNumber { get; set; }
+        public int LifeTime { get; set; }
+        
+        public Trap(int stepNumber) : base(isBarrier: false, isCollectable: false) {
+            StepNumber = stepNumber;
+            LifeTime = 3;
         }
     }
 

@@ -16,19 +16,23 @@ namespace Ira.Game {
         }
 
         public void StartNew(int level = 1) {
-
+            painter.Clear();
+            PlayStartScreen();
+            Console.Write("Нажмите Enter для начала игры: ");
+            Console.ReadLine();
             while(level < 6) {
+                Utils.PlayMainTheme();
                 Read_Data(level);
-                painter.Clear();
-                painter.DrawBoard(board, player, enemies);//startScreen
-                Console.Write("Нажмите Enter для начала игры: ");
-                Console.ReadLine();
-                if (!PlayTheGame())
+                var win = PlayTheGame();
+                Utils.StopMainTheme();
+                if(!win)
                     break;
-                painter.DrawWinScreen();
+                Utils.Play_Sound_Exit();
+                PlayWinScreen();
                 level++;
+                Console.ReadLine();
             }
-            painter.DrawDieScreen();
+            PlayDieScreen();
         }
 
         private bool PlayTheGame() {
@@ -67,6 +71,7 @@ namespace Ira.Game {
                 board.ProcessElements(player, enemies);
                 foreach (var e in enemies) {
                     e.Move();
+                    e.InteractWithBoard();
                 }
                 if (enemies.Count == 0) {
                     finish.ExitMode = true;
@@ -83,6 +88,27 @@ namespace Ira.Game {
                     return true;
                 }
             }
+        }
+
+        private void PlayStartScreen() {
+            painter.Clear();
+            var fileName = ".\\media\\StartScreen.txt";
+            string[] fileLines = File.ReadAllLines(fileName);
+            painter.DrawScreen(fileLines);
+        }
+        
+        private void PlayWinScreen() {
+            painter.Clear();
+            var fileName = ".\\media\\WinScreen.txt";
+            string[] fileLines = File.ReadAllLines(fileName);
+            painter.DrawScreen(fileLines);
+        }
+        
+        private void PlayDieScreen() {
+            painter.Clear();
+            var fileName = ".\\media\\DieScreen.txt";
+            string[] fileLines = File.ReadAllLines(fileName);
+            painter.DrawScreen(fileLines);
         }
         
         private void Read_Data(int level) {
@@ -115,11 +141,33 @@ namespace Ira.Game {
                         case 'F':                           
                             board[x, y]= finish = new Finish();
                             break;
+                        
+                        //bonus elements
+                        case 'A':                           
+                            board[x, y] = new Armor();
+                            break;
+                        case 'W':                           
+                            board[x, y] = new BombPowerBonus();
+                            break;
+                        case 'Z':                           
+                            board[x, y] = new BombCountBonus();
+                            break;
 
+                        //characters
                         case 'E':
-                            var enemy = new Enemy(x, y, board);
+                            var enemy = new Enemy(x, y, board, 0);
                             board[x, y] = null;
                             enemies.Add(enemy);
+                            break;
+                        case 'S':
+                            var smartEnemy = new Enemy(x, y, board, 1);
+                            board[x, y] = null;
+                            enemies.Add(smartEnemy);
+                            break;
+                        case 'I':
+                            var intelegentEnemy = new Enemy(x, y, board, 2);
+                            board[x, y] = null;
+                            enemies.Add(intelegentEnemy);
                             break;
 
                         case 'P':
@@ -160,6 +208,5 @@ namespace Ira.Game {
 
             return result;
         }
-        
     }
 }

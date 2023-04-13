@@ -29,25 +29,29 @@ namespace Ira.Game {
       StepNumber++;
       for (var x = 0; x < Width; x++) {
         for (var y = 0; y < Height; y++) {
-          switch (this[x,y]) {
+          switch (this[x, y]) {
             case Bomb b: {
               b.Tick();
               if (b.Ticks == 0) {
                 player.BombsUsed--;
-                this[x, y] = new Fire();
+                this[x, y] = new Fire(this.StepNumber);
                 for (var i = 1; i <= b.Power; i++) {
-                  if(!SetTheFire(x+i,y)) break;
+                  if (!SetTheFire(x + i, y)) break;
                 }
+
                 for (var i = 1; i <= b.Power; i++) {
-                  if(!SetTheFire(x-i,y)) break;
+                  if (!SetTheFire(x - i, y)) break;
                 }
+
                 for (var i = 1; i <= b.Power; i++) {
-                  if(!SetTheFire(x,y+i)) break;
+                  if (!SetTheFire(x, y + i)) break;
                 }
+
                 for (var i = 1; i <= b.Power; i++) {
-                  if(!SetTheFire(x,y-i)) break;
+                  if (!SetTheFire(x, y - i)) break;
                 }
               }
+
               break;
             }
             case Fire f: {
@@ -56,6 +60,13 @@ namespace Ira.Game {
               }
               break;
             }
+            case Trap t: {
+              if (t.StepNumber+t.LifeTime <= this.StepNumber) {
+                this[x, y] = null;
+              }
+              break;
+            }
+            
           }
         }
       }
@@ -63,14 +74,18 @@ namespace Ira.Game {
       for (var i = 0; i < enemies.Count;) {
         var e = enemies[i];
         if (this[e.X, e.Y] is Fire) {
-          enemies.Remove(e);
+          if (e.IsProtected) {
+            e.IsProtected = false;
+            i++;
+          }
+          else enemies.Remove(e);
         }
         else {
           i++;
         }
       }
 
-     
+
     }
 
     /// <summary>
@@ -81,7 +96,7 @@ namespace Ira.Game {
       var el = this[x, y]; 
       if (el is PermanentWall) return false;
       if (el is Finish) return false;
-      this[x, y] = new Fire {StepNumber = this.StepNumber};
+      this[x, y] = new Fire(this.StepNumber);
       if (el is CrumblingWall) return false;
       return true;
     }

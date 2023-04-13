@@ -99,7 +99,24 @@ namespace Ira.Game {
             case Fire f:
                 ColorConsole.Write(" ", ConsoleColor.White, ConsoleColor.Red);
               break;
+            case Trap t:
+                ColorConsole.Write("T", ConsoleColor.White, ConsoleColor.Red);
+              break;
+            
+            case Armor a:
+              ColorConsole.Write("A", ConsoleColor.Magenta);
+              break;
+            case BombPowerBonus p:
+              ColorConsole.Write("!", ConsoleColor.Magenta);
+              break;
+            case BombCountBonus c:
+              ColorConsole.Write("C", ConsoleColor.Magenta);
+              break;
+
+            
+            
             default:
+              //var enemy = enemies.FirstOrDefault(e => e.X == x && e.Y == y);
               if (enemies.Any(e => e.X == x && e.Y == y)) {
                 ColorConsole.Write("E", ConsoleColor.DarkRed);
               }
@@ -123,47 +140,18 @@ namespace Ira.Game {
       ColorConsole.WriteLine();
     }
 
-    public void DrawStartScreen() {
-    }
+    public void DrawScreen(string[] fileLines) {
+      var height = fileLines.Length;
+      for (int y = 0; y < height; y++) { // перебираем все файловые строки
+        var line = fileLines[y];
+        ColorConsole.Write("\t");
+        for (int x = 0; x < line.Length; x++) { //перебираем все символы строки
+          Console.Write(line[x]);
+        }
+        ColorConsole.WriteLine();
+      }
+      ColorConsole.WriteLine();
 
-    public void DrawWinScreen() {
     }
-
-    public void DrawDieScreen() {
-    }
-
-    // public void DrawEndScreen() {
-    //   // Console.Clear();
-    //   Console.Title = $"{Title}";
-    //
-    //   for (var y = 0; y < board.Height; y++) {
-    //     ColorConsole.Write("\t");
-    //     for (var x = 0; x < board.Width; x++) {
-    //       switch (board[x, y]) {
-    //         case PermanentWall el: {
-    //           break;
-    //         }
-    //         case CrumblingWall el:
-    //           ColorConsole.Write("░", ConsoleColor.DarkYellow);
-    //           break;
-    //
-    //         case Coins c:
-    //           ColorConsole.Write("@", ConsoleColor.Yellow);
-    //           break;
-    //         case Bomb b:
-    //             ColorConsole.Write("?", ConsoleColor.Red);
-    //           break;
-    //         default:
-    //           break;
-    //       }
-    //     }
-    //
-    //     ColorConsole.WriteLine();
-    //   }
-    //
-    //   ColorConsole.WriteLine();
-    // }
-    
-    
   }
 }
