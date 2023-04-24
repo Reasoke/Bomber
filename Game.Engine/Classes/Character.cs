@@ -24,7 +24,6 @@
       if (x >= 0 && x < board.Width && y >= 0 && y < board.Height && (board[x, y] == null || !board[x, y].IsBarrier)) {
         return true;
       }
-
       return false;
     }
   }

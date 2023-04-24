@@ -35,7 +35,7 @@ namespace Ira.Game {
       Y = respawnPoint.Y;
     }
 
-    public override void Move() {
+    protected override void InternalMove() {
       switch (MoveDirection) {
         case MoveDirection.None:
           //stay here

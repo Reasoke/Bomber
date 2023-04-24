@@ -10,8 +10,13 @@
       this.IsProtected = false;
     }
 
-    public virtual void Move() {
+    public void Move() {
       if (IsBarrier || !IsMovable) return;
+      InternalMove();
+    }
+
+    protected virtual void InternalMove() {
+      //should be overwritten in children's
     }
   }
 }

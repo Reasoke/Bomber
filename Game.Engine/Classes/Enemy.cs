@@ -19,7 +19,7 @@ namespace Ira.Game {
       moveDirection = (MoveDirection) nextDir;
     }
 
-    public override void Move() {
+    protected override void InternalMove() {
       var moved = false;
       int tries = 0;
       // var direction = ((MoveDirection[])Enum.GetValues(typeof(MoveDirection))).ToList();
@@ -62,7 +62,7 @@ namespace Ira.Game {
         }
         else {
           tries = ChooseDirection(tries, direction);
-          if (tries >= 4) {
+          if (tries == 4) {
             break;
           }
         }
