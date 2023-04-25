@@ -84,8 +84,6 @@ namespace Ira.Game {
           i++;
         }
       }
-
-
     }
 
     /// <summary>
@@ -95,6 +93,7 @@ namespace Ira.Game {
       if (x <= 0 || x >= this.Width || y <= 0 || y >= this.Height) return false;
       var el = this[x, y]; 
       if (el is PermanentWall) return false;
+      if (el is Bomb) return false;
       if (el is Finish) return false;
       this[x, y] = new Fire(this.StepNumber);
       if (el is CrumblingWall) return false;

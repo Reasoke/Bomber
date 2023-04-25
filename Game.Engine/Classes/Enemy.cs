@@ -84,7 +84,7 @@ namespace Ira.Game {
           direction.RemoveAt(nextDir);
           break;
       }
-      return tries++;
+      return ++tries;
     }
 
     public void InteractWithBoard() {

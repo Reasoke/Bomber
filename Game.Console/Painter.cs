@@ -117,7 +117,11 @@ namespace Ira.Game {
             
             default:
               //var enemy = enemies.FirstOrDefault(e => e.X == x && e.Y == y);
-              if (enemies.Any(e => e.X == x && e.Y == y)) {
+              if (enemies.Any(e => e.X == x && e.Y == y && e.IsProtected)) {
+                ColorConsole.Write("E", ConsoleColor.Magenta);
+                 
+              }
+              else if (enemies.Any(e => e.X == x && e.Y == y && !e.IsProtected)){
                 ColorConsole.Write("E", ConsoleColor.DarkRed);
               }
               else if (x == player.X && y == player.Y) {

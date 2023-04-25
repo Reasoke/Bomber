@@ -15,7 +15,6 @@ namespace Ira.Game {
 
     public Player(int x, int y, GameBoard board, int lives) : base(x, y, board, lives) {
       LivesCount = lives;
-      BombsUsed = 0;
       SetRespawnLocation(x,y, board);
       SetDefaults();
     }
@@ -31,6 +30,8 @@ namespace Ira.Game {
     private void SetDefaults() {
       BombsLimit = 1;
       BombPower = 2;
+      BombsUsed = 0;
+
       X = respawnPoint.X;
       Y = respawnPoint.Y;
     }

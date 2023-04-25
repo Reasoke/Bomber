@@ -68,11 +68,11 @@ namespace Ira.Game {
 
                 //game logic
                 player.Move();
-                board.ProcessElements(player, enemies);
                 foreach (var e in enemies) {
                     e.Move();
                     e.InteractWithBoard();
                 }
+                board.ProcessElements(player, enemies);
                 if (enemies.Count == 0) {
                     finish.ExitMode = true;
                 }
