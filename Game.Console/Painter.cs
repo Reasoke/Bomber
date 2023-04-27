@@ -116,13 +116,13 @@ namespace Ira.Game {
             
             
             default:
-              //var enemy = enemies.FirstOrDefault(e => e.X == x && e.Y == y);
-              if (enemies.Any(e => e.X == x && e.Y == y && e.IsProtected)) {
-                ColorConsole.Write("E", ConsoleColor.Magenta);
-                 
-              }
-              else if (enemies.Any(e => e.X == x && e.Y == y && !e.IsProtected)){
-                ColorConsole.Write("E", ConsoleColor.DarkRed);
+              var enemy = enemies.FirstOrDefault(e => e.X == x && e.Y == y);
+              if (enemy != null) {
+                var enemySymbol = enemy is IntelegentEnemy ? "I" : "E"; 
+                if (enemy.IsProtected)
+                  ColorConsole.Write(enemySymbol, ConsoleColor.Magenta);
+                else
+                  ColorConsole.Write(enemySymbol, ConsoleColor.DarkRed);
               }
               else if (x == player.X && y == player.Y) {
                 ColorConsole.Write("P", ConsoleColor.Blue);

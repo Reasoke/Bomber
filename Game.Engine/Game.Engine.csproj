@@ -47,6 +47,7 @@
     <Compile Include="Classes\Elements.cs" />
     <Compile Include="Classes\Enemy.cs" />
     <Compile Include="Classes\GameBoard.cs" />
+    <Compile Include="Classes\IntelegentEnemy.cs" />
     <Compile Include="Classes\IPainter.cs" />
     <Compile Include="Classes\MoveDirection.cs" />
     <Compile Include="Classes\Player.cs" />

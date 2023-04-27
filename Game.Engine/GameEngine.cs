@@ -165,7 +165,7 @@ namespace Ira.Game {
                             enemies.Add(smartEnemy);
                             break;
                         case 'I':
-                            var intelegentEnemy = new Enemy(x, y, board, 2);
+                            var intelegentEnemy = new IntelegentEnemy(x, y, board, player);//todo player could not be found at that moment
                             board[x, y] = null;
                             enemies.Add(intelegentEnemy);
                             break;

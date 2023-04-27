@@ -125,9 +125,7 @@ namespace Ira.Game {
         else {
           Die();
         }
-
       }
-
     }
 
     public bool Die() {

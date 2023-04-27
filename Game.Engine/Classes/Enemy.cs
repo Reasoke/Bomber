@@ -83,7 +83,10 @@ namespace Ira.Game {
           moveDirection = direction[nextDir];
           direction.RemoveAt(nextDir);
           break;
+        case 2:
+          break;
       }
+
       return ++tries;
     }
 
@@ -96,5 +99,6 @@ namespace Ira.Game {
         }
       }
     }
+
   }
 }
