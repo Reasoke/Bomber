@@ -43,6 +43,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Classes\BaseElement.cs" />
+    <Compile Include="Classes\Ghost.cs" />
     <Compile Include="Classes\Character.cs" />
     <Compile Include="Classes\Elements.cs" />
     <Compile Include="Classes\Enemy.cs" />

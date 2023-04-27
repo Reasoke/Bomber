@@ -118,7 +118,7 @@ namespace Ira.Game {
             default:
               var enemy = enemies.FirstOrDefault(e => e.X == x && e.Y == y);
               if (enemy != null) {
-                var enemySymbol = enemy is IntelegentEnemy ? "I" : "E"; 
+                var enemySymbol = enemy is IntelegentEnemy ? "I" : enemy is Ghost ? "G": enemy.Smartness == 1 ? "S":"E"; 
                 if (enemy.IsProtected)
                   ColorConsole.Write(enemySymbol, ConsoleColor.Magenta);
                 else
