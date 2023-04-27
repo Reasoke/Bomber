@@ -17,9 +17,10 @@ namespace Ira.Game {
     }
 
     public void DrawBoard(GameBoard board, Player player, List<Enemy> enemies) {
-      Console.SetCursorPosition(0,0);
-      
-      Console.Title = $"{Title} (player position: {player.X} - {player.Y}) Player Score: {player.Score} Player Lives: {player.LivesCount}";
+      Console.SetCursorPosition(0, 0);
+
+      Console.Title =
+        $"{Title} (player position: {player.X} - {player.Y}) Player Score: {player.Score} Player Lives: {player.LivesCount}";
 
       for (var y = 0; y < board.Height; y++) {
         ColorConsole.Write("\t");
@@ -94,15 +95,15 @@ namespace Ira.Game {
               ColorConsole.Write("@", ConsoleColor.Yellow);
               break;
             case Bomb b:
-                ColorConsole.Write(b.Ticks.ToString(), ConsoleColor.White, ConsoleColor.Red);
+              ColorConsole.Write(b.Ticks.ToString(), ConsoleColor.White, ConsoleColor.Red);
               break;
             case Fire f:
-                ColorConsole.Write(" ", ConsoleColor.White, ConsoleColor.Red);
+              ColorConsole.Write(" ", ConsoleColor.White, ConsoleColor.Red);
               break;
             case Trap t:
-                ColorConsole.Write("T", ConsoleColor.White, ConsoleColor.Red);
+              ColorConsole.Write("T", ConsoleColor.White, ConsoleColor.Red);
               break;
-            
+
             case Armor a:
               ColorConsole.Write("A", ConsoleColor.Magenta);
               break;
@@ -112,27 +113,15 @@ namespace Ira.Game {
             case BombCountBonus c:
               ColorConsole.Write("C", ConsoleColor.Magenta);
               break;
+            case Finish f:
+              ColorConsole.Write("F", f.ExitMode ? ConsoleColor.Yellow : ConsoleColor.Green,
+                f.ExitMode ? ConsoleColor.Blue : ConsoleColor.Black);
+              break;
 
-            
-            
+
+
             default:
-              var enemy = enemies.FirstOrDefault(e => e.X == x && e.Y == y);
-              if (enemy != null) {
-                var enemySymbol = enemy is IntelegentEnemy ? "I" : enemy is Ghost ? "G": enemy.Smartness == 1 ? "S":"E"; 
-                if (enemy.IsProtected)
-                  ColorConsole.Write(enemySymbol, ConsoleColor.Magenta);
-                else
-                  ColorConsole.Write(enemySymbol, ConsoleColor.DarkRed);
-              }
-              else if (x == player.X && y == player.Y) {
-                ColorConsole.Write("P", ConsoleColor.Blue);
-              }
-              else if (board[x, y] is Finish f) {
-                ColorConsole.Write("F", f.ExitMode ? ConsoleColor.Yellow : ConsoleColor.Green, f.ExitMode ? ConsoleColor.Blue : ConsoleColor.Black);
-              }
-              else {
-                ColorConsole.Write(" ");
-              }
+              ColorConsole.Write(" ");
 
               break;
           }
@@ -140,8 +129,18 @@ namespace Ira.Game {
 
         ColorConsole.WriteLine();
       }
-
-      ColorConsole.WriteLine();
+      
+      foreach (var enemy in enemies) {
+        var enemySymbol = enemy is IntelegentEnemy ? "I" : enemy is Ghost ? "G" : enemy.Smartness == 1 ? "S" : "E";
+        Console.SetCursorPosition(enemy.X + 8, enemy.Y);
+        if (enemy.IsProtected)
+          ColorConsole.Write(enemySymbol, ConsoleColor.Magenta);
+        else
+          ColorConsole.Write(enemySymbol, ConsoleColor.DarkRed);
+      }
+      
+      Console.SetCursorPosition(player.X + 8, player.Y);
+      ColorConsole.Write("P", ConsoleColor.Blue);
     }
 
     public void DrawScreen(string[] fileLines) {

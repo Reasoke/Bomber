@@ -15,7 +15,7 @@ namespace Ira.Game {
     }
 
     protected override void InternalMove() {
-      arr = Get_Array_Copy(board, board.Width, board.Height);
+      arr = Get_Array_Copy(board.Width, board.Height);
       arr[player.X, player.Y] = -1;
       var input = new List<Point>();
       input.Add(new Point(player.X, player.Y));
@@ -102,7 +102,7 @@ namespace Ira.Game {
       return exitValue;
     }
 
-    private static int[,] Get_Array_Copy(GameBoard board, int width, int height) {
+    private static int[,] Get_Array_Copy(int width, int height) {
       var result = new int[width, height];
       for (int y = 0; y < height; y++) {
         for (int x = 0; x < width; x++) {
