@@ -21,13 +21,13 @@ namespace Ira.Game {
             Console.Write("Нажмите Enter для начала игры: ");
             Console.ReadLine();
             while(level < 6) {
-                // Utils.PlayMainTheme();
+                Utils.PlayMainTheme();
                 Read_Data(level);
                 var win = PlayTheGame();
-                // Utils.StopMainTheme();
+                Utils.StopMainTheme();
                 if(!win)
                     break;
-                // Utils.Play_Sound_Exit();
+                Utils.Play_Sound_Exit();
                 PlayWinScreen();
                 level++;
                 Console.ReadLine();
