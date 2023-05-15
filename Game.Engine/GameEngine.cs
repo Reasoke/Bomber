@@ -20,18 +20,19 @@ namespace Ira.Game {
             PlayStartScreen();
             Console.Write("Нажмите Enter для начала игры: ");
             Console.ReadLine();
-            while(level < 6) {
+            while (level < 6) {
                 Utils.PlayMainTheme();
-                Read_Data(level);
+                ReadData(level);
                 var win = PlayTheGame();
                 Utils.StopMainTheme();
-                if(!win)
+                if (!win)
                     break;
-                Utils.Play_Sound_Exit();
+                Utils.PlaySoundExit();
                 PlayWinScreen();
                 level++;
                 Console.ReadLine();
             }
+
             PlayDieScreen();
         }
 
@@ -61,6 +62,7 @@ namespace Ira.Game {
                     case ConsoleKey.Escape:
                         return false;
                 }
+
                 //Clear keyboard buffer
                 while (Console.KeyAvailable) {
                     Console.ReadKey(true);
@@ -72,12 +74,14 @@ namespace Ira.Game {
                     e.Move();
                     e.InteractWithBoard();
                 }
+
                 board.ProcessElements(player, enemies);
                 if (enemies.Count == 0) {
                     finish.ExitMode = true;
                 }
+
                 player.InteractWithBoard(enemies);
-               
+
 
                 if (!player.IsAlive) {
                     return false;
@@ -96,31 +100,33 @@ namespace Ira.Game {
             string[] fileLines = File.ReadAllLines(fileName);
             painter.DrawScreen(fileLines);
         }
-        
+
         private void PlayWinScreen() {
             painter.Clear();
             var fileName = ".\\media\\WinScreen.txt";
             string[] fileLines = File.ReadAllLines(fileName);
             painter.DrawScreen(fileLines);
         }
-        
+
         private void PlayDieScreen() {
             painter.Clear();
             var fileName = ".\\media\\DieScreen.txt";
             string[] fileLines = File.ReadAllLines(fileName);
             painter.DrawScreen(fileLines);
         }
-        
-        private void Read_Data(int level) {
+
+        private void ReadData(int level) {
             var fileName = $".\\media\\Level_{level}.txt";
             var fileLines = File.ReadAllLines(fileName);
             var height = fileLines.Length;
-            var width = Get_Max_Length(fileLines);
+            var width = GetMaxLength(fileLines);
 
             board = new GameBoard(width, height);
-            for (int y = 0; y < height; y++) { // перебираем все файловые строки
+            for (int y = 0; y < height; y++) {
+                // перебираем все файловые строки
                 var line = fileLines[y];
-                for (int x = 0; x < line.Length; x++) { //перебираем все символы строки
+                for (int x = 0; x < line.Length; x++) {
+                    //перебираем все символы строки
                     var symbol = line[x];
                     switch (symbol) {
                         case '#':
@@ -138,18 +144,18 @@ namespace Ira.Game {
                             board[x, y] = new Coins();
                             break;
 
-                        case 'F':                           
-                            board[x, y]= finish = new Finish();
+                        case 'F':
+                            board[x, y] = finish = new Finish();
                             break;
-                        
+
                         //bonus elements
-                        case 'A':                           
+                        case 'A':
                             board[x, y] = new Armor();
                             break;
-                        case 'W':                           
+                        case 'W':
                             board[x, y] = new BombPowerBonus();
                             break;
-                        case 'Z':                           
+                        case 'Z':
                             board[x, y] = new BombCountBonus();
                             break;
 
@@ -165,12 +171,14 @@ namespace Ira.Game {
                             enemies.Add(smartEnemy);
                             break;
                         case 'I':
-                            var intelegentEnemy = new IntelegentEnemy(x, y, board, player);//todo player could not be found at that moment
+                            var intelegentEnemy =
+                                new IntelligentEnemy(x, y, board,
+                                    player); //todo player could not be found at that moment
                             board[x, y] = null;
                             enemies.Add(intelegentEnemy);
                             break;
                         case 'G':
-                            var ghost = new Ghost(x, y, board, player);//todo player could not be found at that moment
+                            var ghost = new Ghost(x, y, board, player); //todo player could not be found at that moment
                             board[x, y] = null;
                             enemies.Add(ghost);
                             break;
@@ -180,7 +188,7 @@ namespace Ira.Game {
                                 player = new Player(x, y, board, 3);
                             }
                             else {
-                                player.SetRespawnLocation(x,y,board);
+                                player.SetRespawnLocation(x, y, board);
                                 // throw new Exception("ERROR: Игррок уже существует.");
                             }
 
@@ -191,7 +199,7 @@ namespace Ira.Game {
             }
         }
 
-        private int Get_Max_Length(string[] lines) {
+        private int GetMaxLength(string[] lines) {
             if (lines == null) {
                 return 0;
             }
@@ -208,6 +216,7 @@ namespace Ira.Game {
                 if (result < len) {
                     result = len;
                 }
+
                 i++;
             }
 

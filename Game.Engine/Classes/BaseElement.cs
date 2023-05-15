@@ -1,22 +1,22 @@
 ﻿namespace Ira.Game {
-  public abstract class BaseElement {
-    public bool IsMovable { get; protected set; }
-    public bool IsProtected { get; set; }
-    public bool IsBarrier { get; }
+    public abstract class BaseElement {
+        public bool IsMovable { get; protected set; }
+        public bool IsProtected { get; set; }
+        public bool IsBarrier { get; }
 
-    public BaseElement(bool isBarrier = false) {
-      this.IsBarrier = isBarrier;
-      this.IsMovable = false;
-      this.IsProtected = false;
-    }
+        public BaseElement(bool isBarrier = false) {
+            this.IsBarrier = isBarrier;
+            this.IsMovable = false;
+            this.IsProtected = false;
+        }
 
-    public void Move() {
-      if (IsBarrier || !IsMovable) return;
-      InternalMove();
-    }
+        public void Move() {
+            if (IsBarrier || !IsMovable) return;
+            InternalMove();
+        }
 
-    protected virtual void InternalMove() {
-      //should be overwritten in children's
+        protected virtual void InternalMove() {
+            //should be overwritten in children's
+        }
     }
-  }
 }
