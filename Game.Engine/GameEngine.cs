@@ -41,32 +41,32 @@ namespace Ira.Game {
             while (true) {
                 painter.DrawBoard(board, player, enemies);
 
-                //keyboard
-                var key = Console.ReadKey(true);
-                switch (key.Key) {
-                    case ConsoleKey.UpArrow:
-                        player.MoveDirection = MoveDirection.Up;
-                        break;
-                    case ConsoleKey.DownArrow:
-                        player.MoveDirection = MoveDirection.Down;
-                        break;
-                    case ConsoleKey.RightArrow:
-                        player.MoveDirection = MoveDirection.Right;
-                        break;
-                    case ConsoleKey.LeftArrow:
-                        player.MoveDirection = MoveDirection.Left;
-                        break;
-                    case ConsoleKey.Spacebar:
-                        player.SetTheBomb();
-                        break;
-                    case ConsoleKey.Escape:
-                        return false;
-                }
-
-                //Clear keyboard buffer
-                while (Console.KeyAvailable) {
-                    Console.ReadKey(true);
-                }
+                // //keyboard
+                // var key = Console.ReadKey(true);
+                // switch (key.Key) {
+                //     case ConsoleKey.UpArrow:
+                //         player.MoveDirection = MoveDirection.Up;
+                //         break;
+                //     case ConsoleKey.DownArrow:
+                //         player.MoveDirection = MoveDirection.Down;
+                //         break;
+                //     case ConsoleKey.RightArrow:
+                //         player.MoveDirection = MoveDirection.Right;
+                //         break;
+                //     case ConsoleKey.LeftArrow:
+                //         player.MoveDirection = MoveDirection.Left;
+                //         break;
+                //     case ConsoleKey.Spacebar:
+                //         player.SetTheBomb();
+                //         break;
+                //     case ConsoleKey.Escape:
+                //         return false;
+                // }
+                //
+                // //Clear keyboard buffer
+                // while (Console.KeyAvailable) {
+                //     Console.ReadKey(true);
+                // }
 
                 //game logic
                 player.Move();
