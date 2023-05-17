@@ -9,6 +9,7 @@ namespace Ira.Game {
         public Point Position {
             get => position;
             protected set {
+                if(position == value) return;
                 position = value;
                 PositionChanged();
             }

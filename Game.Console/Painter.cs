@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 
 namespace Ira.Game {
     public class Painter : IPainter {
@@ -141,13 +142,35 @@ namespace Ira.Game {
             ColorConsole.Write("P", ConsoleColor.Blue);
         }
 
-        public void DrawScreen(string[] fileLines) {
+        public void DrawStart() {
+            const string fileName = ".\\media\\StartScreen.txt";
+            var fileLines = File.ReadAllLines(fileName);
+            DrawScreen(fileLines);
+            Console.Write("Нажмите Enter для начала игры или Escape для выхода...");
+        }
+
+        public void DrawWin() {
+            const string fileName = ".\\media\\WinScreen.txt";
+            var fileLines = File.ReadAllLines(fileName);
+            DrawScreen(fileLines);
+            Console.Write("Нажмите Enter для запуска следующего уровня...");
+        }
+
+        public void DrawLose() {
+            const string fileName = ".\\media\\DieScreen.txt";
+            var fileLines = File.ReadAllLines(fileName);
+            DrawScreen(fileLines);
+            Console.Write("Нажмите Enter для запуска новой игры или Escape для выхода...");
+        }
+
+        private void DrawScreen(string[] fileLines) {
+            Console.Clear();
             var height = fileLines.Length;
-            for (int y = 0; y < height; y++) {
+            for (var y = 0; y < height; y++) {
                 // перебираем все файловые строки
                 var line = fileLines[y];
                 ColorConsole.Write("\t");
-                for (int x = 0; x < line.Length; x++) {
+                for (var x = 0; x < line.Length; x++) {
                     //перебираем все символы строки
                     Console.Write(line[x]);
                 }

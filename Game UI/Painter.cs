@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 
@@ -7,7 +6,6 @@ namespace Ira.Game {
     public class Painter: IPainter {
 
         private readonly PictureBox pictureBox;
-        private Image image;
 
         public Painter(PictureBox pictureBox) {
             this.pictureBox = pictureBox;
@@ -59,51 +57,53 @@ namespace Ira.Game {
             }
         }
         
-        private static void DrawElement(Bitmap image, Rectangle rect, string element) {
+        private static void DrawElement(Bitmap image, Rectangle rect, BaseElement element) {
             var color = Color.Gainsboro;
-            var Symbol = "";
+            var symbol = "";
             using (Graphics g = Graphics.FromImage(image)) {
                 switch (element) {
-                    case "Coin":
+                    case Coins e:
                         color = Color.Gold;
-                        Symbol = "C";
+                        symbol = "C";
                         break;
-                    case "Bomb":
+                    case Bomb e:
                         color = Color.Brown;
                         break;
-                    case "Fire":
+                    case Fire e:
                         color = Color.Red;
                         break;
-                    case "Trap":
+                    case Trap e:
                         color = Color.Aqua;
                         break;
-                    case "Armor":
+                    case Armor e:
                         color = Color.Magenta;
-                        Symbol = "A";
+                        symbol = "A";
                         break;
-                    case "BombPowerBonus":
+                    case BombPowerBonus e:
                         color = Color.Orange;
-                        Symbol = "BP";
+                        symbol = "BP";
                         break;
-                    case "BombCountBonus":
+                    case BombCountBonus e:
                         color = Color.Plum;
-                        Symbol = "BC";
+                        symbol = "BC";
                         break;
                 }
                 g.FillRectangle(new SolidBrush(color), rect);
-                g.DrawString(Symbol, new Font("Tahoma", 14), Brushes.Black, rect);
+                if(!string.IsNullOrEmpty(symbol))
+                    g.DrawString(symbol, new Font("Tahoma", 14), Brushes.Black, rect);
             }
         }
         
         public void DrawBoard(GameBoard board, Player player, List<Enemy> enemies) {
-            var image = new Bitmap(pictureBox.Width, pictureBox.Height);
-            var cellHeight = image.Height/ board.Height;
-            var cellWidth = image.Width/ board.Width;
+            var cellHeight = 100;
+            var cellWidth = 100;
+            var image = new Bitmap(board.Width * cellWidth, board.Height * cellHeight);
             // Console.Title = $"{Title} (player position: {player.Position.X} - {player.Position.Y}) Player Score: {player.Score} Player Lives: {player.LivesCount}";
 
             for (var y = 0; y < board.Height; y++) {
                 for (var x = 0; x < board.Width; x++) {
-                    switch (board[x, y]) {
+                    var item = board[x, y];
+                    switch (item) {
                         case PermanentWall el: {
                             DrawWall(image, new Rectangle(x*cellWidth, y* cellHeight, cellWidth, cellHeight), false);
                             break;
@@ -113,25 +113,25 @@ namespace Ira.Game {
                             break;
 
                         case Coins c:
-                            DrawElement(image, new Rectangle(x*cellWidth, y* cellHeight, cellWidth, cellHeight),"Coins");
+                            DrawElement(image, new Rectangle(x*cellWidth, y* cellHeight, cellWidth, cellHeight), item);
                             break;
                         case Bomb b:
-                            DrawElement(image, new Rectangle(x*cellWidth, y* cellHeight, cellWidth, cellHeight), "Bomb");
+                            DrawElement(image, new Rectangle(x*cellWidth, y* cellHeight, cellWidth, cellHeight), item);
                             break;
                         case Fire f:
-                            DrawElement(image, new Rectangle(x*cellWidth, y* cellHeight, cellWidth, cellHeight), "Fire");
+                            DrawElement(image, new Rectangle(x*cellWidth, y* cellHeight, cellWidth, cellHeight), item);
                             break;
                         case Trap t:
-                            DrawElement(image, new Rectangle(x*cellWidth, y* cellHeight, cellWidth, cellHeight), "Trap");
+                            DrawElement(image, new Rectangle(x*cellWidth, y* cellHeight, cellWidth, cellHeight), item);
                             break;
                         case Armor a:
-                            DrawElement(image, new Rectangle(x*cellWidth, y* cellHeight, cellWidth, cellHeight), "Armor");
+                            DrawElement(image, new Rectangle(x*cellWidth, y* cellHeight, cellWidth, cellHeight), item);
                             break;
                         case BombPowerBonus p:
-                            DrawElement(image, new Rectangle(x*cellWidth, y* cellHeight, cellWidth, cellHeight), "BombPowerBonus");
+                            DrawElement(image, new Rectangle(x*cellWidth, y* cellHeight, cellWidth, cellHeight), item);
                             break;
                         case BombCountBonus c:
-                            DrawElement(image, new Rectangle(x*cellWidth, y* cellHeight, cellWidth, cellHeight), "BombCountBonus");
+                            DrawElement(image, new Rectangle(x*cellWidth, y* cellHeight, cellWidth, cellHeight), item);
                             break;
                         
                         case Finish f:
@@ -156,11 +156,19 @@ namespace Ira.Game {
             pictureBox.Image = image;
         }
 
-        public void Clear() {
-            // Redraw();
+        public void DrawStart() {
+            pictureBox.ImageLocation = "./media/start.png";
         }
 
-        public void DrawScreen(string[] fileLines) {
+        public void DrawLose() {
+            pictureBox.ImageLocation = "./media/die.png";
+        }
+
+        public void DrawWin() {
+            pictureBox.ImageLocation = "./media/win.png";
+        }
+
+        public void Clear() {
             // Redraw();
         }
         

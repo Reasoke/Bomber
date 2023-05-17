@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace Ira.Game {
     public class GameEngine {
@@ -10,109 +11,137 @@ namespace Ira.Game {
         private Player player;
         private readonly List<Enemy> enemies = new List<Enemy>();
         private GameBoard board;
-
+        private int currentLevel;
+        
+        public GameStates State { get; private set; }
+        
         public GameEngine(IPainter painter) {
             this.painter = painter;
+            State = GameStates.Start;
+            Start();
         }
 
-        public void StartNew(int level = 1) {
-            painter.Clear();
-            PlayStartScreen();
-            Console.Write("Нажмите Enter для начала игры: ");
-            Console.ReadLine();
-            while (level < 6) {
-                Utils.PlayMainTheme();
-                ReadData(level);
-                var win = PlayTheGame();
-                Utils.StopMainTheme();
-                if (!win)
+        public void ProcessAction(ControllerActions action) {
+            switch (State) {
+                case GameStates.Start:
+                    switch (action) {
+                        case ControllerActions.Exit:
+                            State = GameStates.Exit;
+                            break;
+                        case ControllerActions.Start:
+                            State = GameStates.Game;
+                            StartLevel();
+                            break;
+                    }
                     break;
-                Utils.PlaySoundExit();
-                PlayWinScreen();
-                level++;
-                Console.ReadLine();
+                case GameStates.Exit:
+                    //nothing to do
+                    Environment.Exit(0);
+                    break;
+                case GameStates.Win:
+                    if (action == ControllerActions.Start) {
+                        if (currentLevel < 6) {
+                            State = GameStates.Game;
+                            currentLevel++;
+                            StartLevel();
+                        }
+                        else {
+                            //no more levels supported
+                            State = GameStates.Start;
+                            Start();
+                        }
+                    }
+                    break;
+                case GameStates.Lose:
+                    switch (action) {
+                        case ControllerActions.Start:
+                            State = GameStates.Start;
+                            Start();
+                            break;
+                        case ControllerActions.Exit:
+                            State = GameStates.Exit;
+                            break;
+                    }
+                    break;
+                case GameStates.Game:
+                    switch (action) {
+                        case ControllerActions.Exit:
+                            State = GameStates.Lose;
+                            StopLevel();
+                            return;
+                        
+                        case ControllerActions.Up:
+                            player.MoveDirection = MoveDirection.Up;
+                            break;
+                        case ControllerActions.Down:
+                            player.MoveDirection = MoveDirection.Down;
+                            break;
+                        case ControllerActions.Right:
+                            player.MoveDirection = MoveDirection.Right;
+                            break;
+                        case ControllerActions.Left:
+                            player.MoveDirection = MoveDirection.Left;
+                            break;
+                        case ControllerActions.Bomb:
+                            player.SetTheBomb();
+                            break;
+                        default:
+                            break;
+                    }
+
+                    MakeMove();
+                    if (!player.IsAlive) {
+                        State = GameStates.Lose;
+                        StopLevel();
+                    }
+                    else if (player.IsWinner) {
+                        Utils.PlaySoundExit();
+                        player.IsWinner = false;
+                        State = GameStates.Win;
+                        StopLevel();
+                    }
+                    break;
+            }
+        }
+        
+        public void Start(int level = 1) {
+            painter.DrawStart();
+            currentLevel = level;
+        }
+
+        private void StartLevel() {
+            Utils.PlayMainTheme();
+            ReadData(currentLevel);
+            painter.Clear();
+            painter.DrawBoard(board, player, enemies);
+        }
+
+        private void StopLevel() {
+            Utils.StopMainTheme();
+            if (State == GameStates.Win){
+                painter.DrawWin();
+            }
+            else {
+                painter.DrawLose();
+            }
+        }
+
+        private void MakeMove() {
+            //game logic
+            player.Move();
+            foreach (var e in enemies) {
+                e.Move();
+                e.InteractWithBoard();
             }
 
-            PlayDieScreen();
-        }
-
-        private bool PlayTheGame() {
-            painter.Clear();
-            while (true) {
-                painter.DrawBoard(board, player, enemies);
-
-                // //keyboard
-                // var key = Console.ReadKey(true);
-                // switch (key.Key) {
-                //     case ConsoleKey.UpArrow:
-                //         player.MoveDirection = MoveDirection.Up;
-                //         break;
-                //     case ConsoleKey.DownArrow:
-                //         player.MoveDirection = MoveDirection.Down;
-                //         break;
-                //     case ConsoleKey.RightArrow:
-                //         player.MoveDirection = MoveDirection.Right;
-                //         break;
-                //     case ConsoleKey.LeftArrow:
-                //         player.MoveDirection = MoveDirection.Left;
-                //         break;
-                //     case ConsoleKey.Spacebar:
-                //         player.SetTheBomb();
-                //         break;
-                //     case ConsoleKey.Escape:
-                //         return false;
-                // }
-                //
-                // //Clear keyboard buffer
-                // while (Console.KeyAvailable) {
-                //     Console.ReadKey(true);
-                // }
-
-                //game logic
-                player.Move();
-                foreach (var e in enemies) {
-                    e.Move();
-                    e.InteractWithBoard();
-                }
-
-                board.ProcessElements(player, enemies);
-                if (enemies.Count == 0) {
-                    finish.ExitMode = true;
-                }
-
-                player.InteractWithBoard(enemies);
-
-
-                if (!player.IsAlive) {
-                    return false;
-                }
-
-                if (player.IsWinner) {
-                    player.IsWinner = false;
-                    return true;
-                }
+            board.ProcessElements(player, enemies);
+            if (enemies.Count == 0) {
+                finish.ExitMode = true;
             }
-        }
 
-        private void PlayStartScreen() {
-            painter.Clear();
-            var fileName = ".\\media\\StartScreen.txt";
-            string[] fileLines = File.ReadAllLines(fileName);
-            painter.DrawScreen(fileLines);
-        }
+            player.InteractWithBoard(enemies);
 
-        private void PlayWinScreen() {
-            painter.Clear();
-            var fileName = ".\\media\\WinScreen.txt";
-            string[] fileLines = File.ReadAllLines(fileName);
-            painter.DrawScreen(fileLines);
-        }
-
-        private void PlayDieScreen() {
-            painter.Clear();
-            var fileName = ".\\media\\DieScreen.txt";
-            string[] fileLines = File.ReadAllLines(fileName);
-            painter.DrawScreen(fileLines);
+            painter.DrawBoard(board, player, enemies);
         }
 
         private void ReadData(int level) {
@@ -122,6 +151,7 @@ namespace Ira.Game {
             var width = GetMaxLength(fileLines);
 
             board = new GameBoard(width, height);
+            enemies.Clear();
             for (int y = 0; y < height; y++) {
                 // перебираем все файловые строки
                 var line = fileLines[y];
@@ -200,27 +230,7 @@ namespace Ira.Game {
         }
 
         private int GetMaxLength(string[] lines) {
-            if (lines == null) {
-                return 0;
-            }
-
-            var linesCount = lines.Length;
-            if (linesCount == 0) {
-                return 0;
-            }
-
-            var i = 0;
-            var result = lines[i++].Length;
-            while (i < linesCount) {
-                var len = lines[i].Length;
-                if (result < len) {
-                    result = len;
-                }
-
-                i++;
-            }
-
-            return result;
+            return lines == null || lines.Length == 0 ? 0 : lines.Max(l => l.Length);
         }
     }
 }

@@ -8,7 +8,7 @@
         <OutputType>Exe</OutputType>
         <RootNamespace>Ira.Game</RootNamespace>
         <AssemblyName>Game.Console</AssemblyName>
-        <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+        <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
         <FileAlignment>512</FileAlignment>
         <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
         <Deterministic>true</Deterministic>
@@ -54,6 +54,17 @@
             <Project>{d3d5ef01-c76b-40df-99ff-053e29d2eb88}</Project>
             <Name>Game.Engine</Name>
         </ProjectReference>
+    </ItemGroup>
+    <ItemGroup>
+      <Content Include="media\DieScreen.txt">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Include="media\StartScreen.txt">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Include="media\WinScreen.txt">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
     </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
