@@ -107,6 +107,7 @@ namespace Ira.Game {
         public void Start(int level = 1) {
             painter.DrawStart();
             currentLevel = level;
+            player = new Player(1, 1, board, 3);
         }
 
         private void StartLevel() {
@@ -201,11 +202,11 @@ namespace Ira.Game {
                             enemies.Add(smartEnemy);
                             break;
                         case 'I':
-                            var intelegentEnemy =
+                            var intelligentEnemy =
                                 new IntelligentEnemy(x, y, board,
                                     player); //todo player could not be found at that moment
                             board[x, y] = null;
-                            enemies.Add(intelegentEnemy);
+                            enemies.Add(intelligentEnemy);
                             break;
                         case 'G':
                             var ghost = new Ghost(x, y, board, player); //todo player could not be found at that moment
@@ -214,14 +215,7 @@ namespace Ira.Game {
                             break;
 
                         case 'P':
-                            if (player == null) {
-                                player = new Player(x, y, board, 3);
-                            }
-                            else {
-                                player.SetRespawnLocation(x, y, board);
-                                // throw new Exception("ERROR: Игррок уже существует.");
-                            }
-
+                            player.SetRespawnLocation(x, y, board);
                             board[x, y] = null;
                             break;
                     }

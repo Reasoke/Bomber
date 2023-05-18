@@ -6,153 +6,125 @@ namespace Ira.Game {
     public class Painter: IPainter {
 
         private readonly PictureBox pictureBox;
+        private readonly Image playerImage;
+        private readonly Image enemyImage;
+        private readonly Image enemy2Image;
+        private readonly Image ghostImage;
+        private readonly Image wallImage;
+        private readonly Image wall2Image;
+        private readonly Image coinImage;
+        private readonly Image bombImage;
+        private readonly Image exitImage;
+        private readonly Image exitLockedImage;
+        private readonly Image armorImage;
+        private readonly Image fireImage;
+        private readonly Image trapImage;
+        private readonly Image bombCountImage;
+        private readonly Image bombPowerImage;
 
         public Painter(PictureBox pictureBox) {
             this.pictureBox = pictureBox;
-        }
-        private static void DrawWall(Bitmap image, Rectangle rect, bool isBreakable) {
-            var color = Color.Black;
-            using (Graphics g = Graphics.FromImage(image)) {
-                if (isBreakable) {
-                    color = Color.Khaki;
-                }
-                g.FillRectangle(new SolidBrush(color), rect);
-            }
-        }
-        
-        private static void DrawEmpty(Bitmap image, Rectangle rect) {
-            using (Graphics g = Graphics.FromImage(image)) {
-                g.FillRectangle(new SolidBrush(Color.Gainsboro), rect);
-            }
-        }
-        
-        private static void DrawFinish(Bitmap image, Rectangle rect, bool exitMode) {
-            var color = Color.GreenYellow;
-            using (Graphics g = Graphics.FromImage(image)) {
-                if (!exitMode) {
-                    color = Color.RosyBrown;
-                }
-                g.FillRectangle(new SolidBrush(color), rect);
-                g.DrawString("Exit", new Font("Tahoma", 14), Brushes.Black, rect);
-            }
+            playerImage =  Image.FromFile("./media/player.png");
+            enemyImage =  Image.FromFile("./media/enemy.png");
+            enemy2Image =  Image.FromFile("./media/enemy2.png");
+            ghostImage =  Image.FromFile("./media/ghost.png");
+            wallImage =  Image.FromFile("./media/wall.jpg");
+            wall2Image =  Image.FromFile("./media/wall2.jpg");
+            coinImage =  Image.FromFile("./media/coin.png");
+            bombImage =  Image.FromFile("./media/bomb.png");
+            exitImage =  Image.FromFile("./media/exit.png");
+            exitLockedImage =  Image.FromFile("./media/exitLocked.png");
+            armorImage =  Image.FromFile("./media/armor.png");
+            fireImage =  Image.FromFile("./media/fire.png");
+            trapImage =  Image.FromFile("./media/trap.png");
+            bombCountImage =  Image.FromFile("./media/bombCount.png");
+            bombPowerImage =  Image.FromFile("./media/bombPower.png");
         }
         
-        private static void DrawPlayer(Bitmap image, Rectangle rect) {
-            using (Graphics g = Graphics.FromImage(image)) {
-                g.FillRectangle(new SolidBrush(Color.Blue), rect);
-                g.DrawString("Player", new Font("Tahoma", 14), Brushes.Beige, rect);
+        private void DrawEnemy(Graphics g, Rectangle rect, Enemy e) {
+            if (e.IsProtected) 
+                g.FillRectangle(new SolidBrush(Color.Magenta), rect);
+
+            switch (e) {
+                case Ghost _:
+                    DrawImageStretched(g, ghostImage, rect);
+                    break;
+                case IntelligentEnemy _:
+                    DrawImageStretched(g, enemy2Image, rect);
+                    break;
+                default:
+                    DrawImageStretched(g, enemyImage, rect);
+                    var enemySymbol = e.Smartness == 1 ? "S" : "E";
+                    g.DrawString(enemySymbol, new Font("Tahoma", 14), Brushes.Black, rect);
+                    break;
             }
         }
-        
-        private static void DrawEnemy(Bitmap image, Rectangle rect, Enemy e) {
-            var color = Color.DarkMagenta;
-            using (Graphics g = Graphics.FromImage(image)) {
-                if (e.IsProtected) {
-                    color = Color.Magenta;
-                }
-                g.FillRectangle(new SolidBrush(color), rect);
-                
-                var enemySymbol = e is Ghost ? "G" :  e is IntelligentEnemy? "I" : e.Smartness == 1 ? "S" : "E";
-                g.DrawString(enemySymbol, new Font("Tahoma", 14), Brushes.Black, rect);
-            }
-        }
-        
-        private static void DrawElement(Bitmap image, Rectangle rect, BaseElement element) {
-            var color = Color.Gainsboro;
-            var symbol = "";
-            using (Graphics g = Graphics.FromImage(image)) {
-                switch (element) {
-                    case Coins e:
-                        color = Color.Gold;
-                        symbol = "C";
-                        break;
-                    case Bomb e:
-                        color = Color.Brown;
-                        break;
-                    case Fire e:
-                        color = Color.Red;
-                        break;
-                    case Trap e:
-                        color = Color.Aqua;
-                        break;
-                    case Armor e:
-                        color = Color.Magenta;
-                        symbol = "A";
-                        break;
-                    case BombPowerBonus e:
-                        color = Color.Orange;
-                        symbol = "BP";
-                        break;
-                    case BombCountBonus e:
-                        color = Color.Plum;
-                        symbol = "BC";
-                        break;
-                }
-                g.FillRectangle(new SolidBrush(color), rect);
-                if(!string.IsNullOrEmpty(symbol))
-                    g.DrawString(symbol, new Font("Tahoma", 14), Brushes.Black, rect);
-            }
+
+        private static void DrawImageStretched(Graphics g, Image image, Rectangle rect) {
+            g.DrawImage(image, rect, new Rectangle(0, 0, image.Width, image.Height), GraphicsUnit.Pixel);
         }
         
         public void DrawBoard(GameBoard board, Player player, List<Enemy> enemies) {
-            var cellHeight = 100;
-            var cellWidth = 100;
-            var image = new Bitmap(board.Width * cellWidth, board.Height * cellHeight);
-            // Console.Title = $"{Title} (player position: {player.Position.X} - {player.Position.Y}) Player Score: {player.Score} Player Lives: {player.LivesCount}";
+            const int cellHeight = 100;
+            const int cellWidth = 100;
+            const int scorePanelHeight = 60;
+            var image = new Bitmap(board.Width * cellWidth, board.Height * cellHeight + scorePanelHeight);
+            var score = $"(Position: {player.Position.X} - {player.Position.Y});  Score: {player.Score}; Lives: {player.LivesCount}";
+            using (var g = Graphics.FromImage(image)) {
+                g.Clear(Color.Gainsboro);
+                g.DrawString(score, new Font("Tahoma", 20), Brushes.Black, 0, board.Height * cellHeight + 20);
+                for (var y = 0; y < board.Height; y++) {
+                    for (var x = 0; x < board.Width; x++) {
+                        var item = board[x, y];
+                        var rect = new Rectangle(x * cellWidth, y * cellHeight, cellWidth, cellHeight);
+                        switch (item) {
+                            case PermanentWall _:
+                                DrawImageStretched(g, wallImage, rect);
+                                break;
+                            case CrumblingWall _:
+                                DrawImageStretched(g, wall2Image, rect);
+                                break;
 
-            for (var y = 0; y < board.Height; y++) {
-                for (var x = 0; x < board.Width; x++) {
-                    var item = board[x, y];
-                    switch (item) {
-                        case PermanentWall el: {
-                            DrawWall(image, new Rectangle(x*cellWidth, y* cellHeight, cellWidth, cellHeight), false);
-                            break;
+                            case Coins _:
+                                DrawImageStretched(g, coinImage, rect);
+                                break;
+                            case Bomb _:
+                                DrawImageStretched(g, bombImage, rect);
+                                break;
+                            case Fire _:
+                                DrawImageStretched(g, fireImage, rect);
+                                break;
+                            case Trap _:
+                                DrawImageStretched(g, trapImage, rect);
+                                break;
+                            case Armor _:
+                                DrawImageStretched(g, armorImage, rect);
+                                break;
+                            case BombPowerBonus _:
+                                DrawImageStretched(g, bombPowerImage, rect);
+                                break;
+                            case BombCountBonus _:
+                                DrawImageStretched(g, bombCountImage, rect);
+                                break;
+                            case Finish f:
+                                DrawImageStretched(g, !f.ExitMode ? exitLockedImage : exitImage, rect);
+                                break;
                         }
-                        case CrumblingWall el:
-                            DrawWall(image, new Rectangle(x*cellWidth, y* cellHeight, cellWidth, cellHeight), true);
-                            break;
-
-                        case Coins c:
-                            DrawElement(image, new Rectangle(x*cellWidth, y* cellHeight, cellWidth, cellHeight), item);
-                            break;
-                        case Bomb b:
-                            DrawElement(image, new Rectangle(x*cellWidth, y* cellHeight, cellWidth, cellHeight), item);
-                            break;
-                        case Fire f:
-                            DrawElement(image, new Rectangle(x*cellWidth, y* cellHeight, cellWidth, cellHeight), item);
-                            break;
-                        case Trap t:
-                            DrawElement(image, new Rectangle(x*cellWidth, y* cellHeight, cellWidth, cellHeight), item);
-                            break;
-                        case Armor a:
-                            DrawElement(image, new Rectangle(x*cellWidth, y* cellHeight, cellWidth, cellHeight), item);
-                            break;
-                        case BombPowerBonus p:
-                            DrawElement(image, new Rectangle(x*cellWidth, y* cellHeight, cellWidth, cellHeight), item);
-                            break;
-                        case BombCountBonus c:
-                            DrawElement(image, new Rectangle(x*cellWidth, y* cellHeight, cellWidth, cellHeight), item);
-                            break;
-                        
-                        case Finish f:
-                            DrawFinish(image, new Rectangle(x*cellWidth, y* cellHeight, cellWidth, cellHeight), f.ExitMode);
-                            break;
-
-                        default:
-                            DrawEmpty(image, new Rectangle(x*cellWidth, y* cellHeight, cellWidth, cellHeight));
-                            break;
                     }
                 }
+
+                foreach (var enemy in enemies) {
+                    DrawEnemy(g, new Rectangle(enemy.Position.X * cellWidth, enemy.Position.Y * cellHeight, 
+                        cellWidth, cellHeight), enemy);
+                }
+
+                var pRect = new Rectangle(player.Position.X * cellWidth, player.Position.Y * cellHeight, cellWidth,
+                    cellHeight);
+                if (player.IsProtected) 
+                    g.FillRectangle(new SolidBrush(Color.Magenta), pRect);
+                DrawImageStretched(g, playerImage, pRect);
             }
 
-            foreach (var enemy in enemies) {
-                // Console.SetCursorPosition(enemy.Position.X + 8, enemy.Position.Y);
-                DrawEnemy(image, new Rectangle((enemy.Position.X)*cellWidth, enemy.Position.Y* cellHeight, cellWidth, cellHeight), enemy);
-            }
-
-            // Console.SetCursorPosition(player.Position.X + 8, player.Position.Y);
-            // ColorConsole.Write("P", ConsoleColor.Blue);
-            DrawPlayer(image, new Rectangle((player.Position.X)*cellWidth, player.Position.Y* cellHeight, cellWidth, cellHeight));
             pictureBox.Image = image;
         }
 
@@ -171,6 +143,5 @@ namespace Ira.Game {
         public void Clear() {
             // Redraw();
         }
-        
     }
 }

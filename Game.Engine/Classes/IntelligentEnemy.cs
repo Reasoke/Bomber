@@ -14,13 +14,12 @@ namespace Ira.Game {
             var arr = GetArrayCopy(board, board.Width, board.Height);
             arr[player.Position.X, player.Position.Y] = -1;
             var input = new List<Point> {new Point(player.Position.X, player.Position.Y)};
-            var enemyPosition = new Point(Position.X, Position.Y);
-            CalcNextStep(arr, board.Width, board.Height, input, 1, enemyPosition);
+            CalcNextStep(arr, board.Width, board.Height, input, 1, Position);
 
-            if (IsValidMove(enemyPosition.X - 1, enemyPosition.Y, arr) ||
-                IsValidMove(enemyPosition.X + 1, enemyPosition.Y, arr) || 
-                IsValidMove(enemyPosition.X, enemyPosition.Y - 1, arr) || 
-                IsValidMove(enemyPosition.X, enemyPosition.Y + 1, arr)) {
+            if (IsValidMove(Position.X - 1, Position.Y, arr) ||
+                IsValidMove(Position.X + 1, Position.Y, arr) || 
+                IsValidMove(Position.X, Position.Y - 1, arr) || 
+                IsValidMove(Position.X, Position.Y + 1, arr)) {
                 //moved
             }
         }
