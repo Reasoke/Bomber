@@ -1,4 +1,5 @@
-﻿using System.Windows.Forms;
+﻿using System.Drawing;
+using System.Windows.Forms;
 
 namespace Ira.Game {
     public partial class MainForm : Form {
@@ -7,6 +8,8 @@ namespace Ira.Game {
         public MainForm() {
             InitializeComponent();
             KeyPreview = true;
+            StartPosition = FormStartPosition.CenterScreen;
+            Size = new Size(1024, 768);
             
             var painter = new Painter(pictureBox);
             game = new GameEngine(painter);
@@ -39,6 +42,8 @@ namespace Ira.Game {
                     game.ProcessAction(ControllerActions.Other);
                     break;
             }
+
+            e.SuppressKeyPress = true;
         }
     }
 }

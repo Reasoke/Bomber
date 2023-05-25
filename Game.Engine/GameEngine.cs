@@ -12,6 +12,7 @@ namespace Ira.Game {
         private readonly List<Enemy> enemies = new List<Enemy>();
         private GameBoard board;
         private int currentLevel;
+        private int currentSelectedItem;
         
         public GameStates State { get; private set; }
         
@@ -26,42 +27,105 @@ namespace Ira.Game {
                 case GameStates.Start:
                     switch (action) {
                         case ControllerActions.Exit:
-                            State = GameStates.Exit;
+                            Environment.Exit(0);
                             break;
+                        case ControllerActions.Up:
+                            currentSelectedItem--;
+                            Start();
+                            break;
+                        case ControllerActions.Down:
+                            currentSelectedItem++;
+                            Start();
+                            break;
+
                         case ControllerActions.Start:
-                            State = GameStates.Game;
-                            StartLevel();
+                            switch (currentSelectedItem) {
+                                case 0:
+                                    State = GameStates.Game;
+                                    StartLevel();
+                                    break;
+                                case 1:
+                                    // TODO: State = GameStates.Options;
+                                    break;
+                                case 2:
+                                    // State = GameStates.Exit;
+                                    Environment.Exit(0);
+                                    break;
+                            }
+
+                            break;
+                    }
+
+                    break;
+                case GameStates.Shop:
+                    switch (action) {
+                        case ControllerActions.Exit:
+                            Environment.Exit(0);
+                            break;
+                        case ControllerActions.Up:
+                            currentSelectedItem--;
+                            Shop();
+                            break;
+                        case ControllerActions.Down:
+                            currentSelectedItem++;
+                            Shop();
+                            break;
+
+                        case ControllerActions.Start:
+                            switch (currentSelectedItem) {
+                                case 0:
+                                    //todo: check and take coins if it has
+                                    player.AddLife();
+                                    break;
+                                case 1:
+                                    player.AddBomb();
+                                    break;
+                                case 2:
+                                    player.AddBombPower();
+                                    break;
+                                case 3:
+                                    player.IsProtected = true;
+                                    break;
+                            }
+                            
+                            if (currentLevel < 5) {
+                                State = GameStates.Game;
+                                currentLevel++;
+                                StartLevel();
+                            }
+                            else {
+                                //no more levels supported
+                                State = GameStates.Start;
+                                Start();
+                            }
+
                             break;
                     }
                     break;
+
                 case GameStates.Exit:
                     //nothing to do
                     Environment.Exit(0);
                     break;
                 case GameStates.Win:
                     if (action == ControllerActions.Start) {
-                        if (currentLevel < 6) {
-                            State = GameStates.Game;
-                            currentLevel++;
-                            StartLevel();
-                        }
-                        else {
-                            //no more levels supported
-                            State = GameStates.Start;
-                            Start();
-                        }
+                        State = GameStates.Shop;
+                        currentSelectedItem = 0;
+                        Shop();
                     }
+
                     break;
                 case GameStates.Lose:
-                    switch (action) {
-                        case ControllerActions.Start:
+                    // switch (action) {
+                    //     case ControllerActions.Start:
                             State = GameStates.Start;
+                            currentSelectedItem = 0;
                             Start();
-                            break;
-                        case ControllerActions.Exit:
-                            State = GameStates.Exit;
-                            break;
-                    }
+                    //         break;
+                    //     case ControllerActions.Exit:
+                    //         State = GameStates.Exit;
+                    //         break;
+                    // }
                     break;
                 case GameStates.Game:
                     switch (action) {
@@ -85,8 +149,6 @@ namespace Ira.Game {
                         case ControllerActions.Bomb:
                             player.SetTheBomb();
                             break;
-                        default:
-                            break;
                     }
 
                     MakeMove();
@@ -104,13 +166,23 @@ namespace Ira.Game {
             }
         }
         
-        public void Start(int level = 1) {
-            painter.DrawStart();
+        public void Start(int level = 0) {
+            if (currentSelectedItem < 0) currentSelectedItem = 2;
+            if (currentSelectedItem > 2) currentSelectedItem = 0;
+            painter.DrawStart(currentSelectedItem);
+            Utils.PlaySoundMove();
             currentLevel = level;
-            player = new Player(1, 1, board, 3);
+        }
+        
+        public void Shop() {
+            if (currentSelectedItem < 0) currentSelectedItem = 4;
+            if (currentSelectedItem > 4) currentSelectedItem = 0;
+            painter.DrawShop(currentSelectedItem);
+            Utils.PlaySoundMove();
         }
 
         private void StartLevel() {
+            if(player == null) player = new Player(1, 1, board, 3);
             Utils.PlayMainTheme();
             ReadData(currentLevel);
             painter.Clear();
@@ -123,6 +195,7 @@ namespace Ira.Game {
                 painter.DrawWin();
             }
             else {
+                player = null;
                 painter.DrawLose();
             }
         }

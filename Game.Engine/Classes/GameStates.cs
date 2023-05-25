@@ -4,6 +4,7 @@
         Game,
         Win,
         Lose,
-        Exit
+        Exit,
+        Shop,
     }
 }

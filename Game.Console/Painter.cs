@@ -142,11 +142,14 @@ namespace Ira.Game {
             ColorConsole.Write("P", ConsoleColor.Blue);
         }
 
-        public void DrawStart() {
+        public void DrawStart(int selectedItem) {
             const string fileName = ".\\media\\StartScreen.txt";
             var fileLines = File.ReadAllLines(fileName);
             DrawScreen(fileLines);
-            Console.Write("Нажмите Enter для начала игры или Escape для выхода...");
+            ColorConsole.WriteLine("start", selectedItem == 0 ? ConsoleColor.Yellow : ConsoleColor.DarkGray);
+            ColorConsole.WriteLine("options", selectedItem == 1 ? ConsoleColor.Yellow : ConsoleColor.DarkGray);
+            ColorConsole.WriteLine("exit", selectedItem == 2 ? ConsoleColor.Yellow : ConsoleColor.DarkGray);
+            // Console.Write("Нажмите Enter для начала игры или Escape для выхода...");
         }
 
         public void DrawWin() {
@@ -154,6 +157,18 @@ namespace Ira.Game {
             var fileLines = File.ReadAllLines(fileName);
             DrawScreen(fileLines);
             Console.Write("Нажмите Enter для запуска следующего уровня...");
+        }
+
+        public void DrawShop(int selectedItem) {
+            Console.Clear();
+            ColorConsole.WriteLine("SHOP", ConsoleColor.Cyan);
+            Console.WriteLine();
+            ColorConsole.WriteLine("life", selectedItem == 0 ? ConsoleColor.Yellow : ConsoleColor.DarkGray);
+            ColorConsole.WriteLine("bomb count", selectedItem == 1 ? ConsoleColor.Yellow : ConsoleColor.DarkGray);
+            ColorConsole.WriteLine("bomb power", selectedItem == 2 ? ConsoleColor.Yellow : ConsoleColor.DarkGray);
+            ColorConsole.WriteLine("armor", selectedItem == 3 ? ConsoleColor.Yellow : ConsoleColor.DarkGray);
+            ColorConsole.WriteLine("nothing", selectedItem == 4 ? ConsoleColor.Yellow : ConsoleColor.DarkGray);
+
         }
 
         public void DrawLose() {

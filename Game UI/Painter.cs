@@ -21,6 +21,8 @@ namespace Ira.Game {
         private readonly Image trapImage;
         private readonly Image bombCountImage;
         private readonly Image bombPowerImage;
+        private readonly Image selectorImage;
+        private readonly Image shopSelectorImage;
 
         public Painter(PictureBox pictureBox) {
             this.pictureBox = pictureBox;
@@ -39,6 +41,8 @@ namespace Ira.Game {
             trapImage =  Image.FromFile("./media/trap.png");
             bombCountImage =  Image.FromFile("./media/bombCount.png");
             bombPowerImage =  Image.FromFile("./media/bombPower.png");
+            selectorImage =  Image.FromFile("./media/selector.png");
+            shopSelectorImage =  Image.FromFile("./media/shopSelector.png");
         }
         
         private void DrawEnemy(Graphics g, Rectangle rect, Enemy e) {
@@ -69,7 +73,7 @@ namespace Ira.Game {
             const int cellWidth = 100;
             const int scorePanelHeight = 60;
             var image = new Bitmap(board.Width * cellWidth, board.Height * cellHeight + scorePanelHeight);
-            var score = $"(Position: {player.Position.X} - {player.Position.Y});  Score: {player.Score}; Lives: {player.LivesCount}";
+            var score = $"Pomb limit: {player.BombsLimit}; Pomb power: {player.BombPower}; Score: {player.Score}; Lives: {player.LivesCount}; Has armor: {player.IsProtected}";
             using (var g = Graphics.FromImage(image)) {
                 g.Clear(Color.Gainsboro);
                 g.DrawString(score, new Font("Tahoma", 20), Brushes.Black, 0, board.Height * cellHeight + 20);
@@ -128,8 +132,14 @@ namespace Ira.Game {
             pictureBox.Image = image;
         }
 
-        public void DrawStart() {
-            pictureBox.ImageLocation = "./media/start.png";
+        public void DrawStart(int selectedItem) {
+            // pictureBox.ImageLocation = "./media/start.png";
+            var image = new Bitmap("./media/start.png");
+            using (var g = Graphics.FromImage(image)) {
+                DrawImageStretched(g, selectorImage,
+                    new Rectangle(825, 585 + 130 * selectedItem, selectorImage.Width, selectorImage.Height));
+            }
+            pictureBox.Image = image;
         }
 
         public void DrawLose() {
@@ -138,6 +148,15 @@ namespace Ira.Game {
 
         public void DrawWin() {
             pictureBox.ImageLocation = "./media/win.png";
+        }
+
+        public void DrawShop(int selectedItem) {
+            var image = new Bitmap("./media/shop.png");
+            using (var g = Graphics.FromImage(image)) {
+                DrawImageStretched(g, shopSelectorImage,
+                    new Rectangle(100, 200 + 130 * selectedItem, shopSelectorImage.Width, shopSelectorImage.Height));
+            }
+            pictureBox.Image = image;
         }
 
         public void Clear() {

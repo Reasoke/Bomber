@@ -19,6 +19,17 @@ namespace Ira.Game {
             SetDefaults();
         }
 
+        public void AddLife() {
+            LivesCount++;
+        }
+        public void AddBomb() {
+            BombsLimit++;
+        }
+        public void AddBombPower() {
+            BombPower++;
+        }
+        
+        
         public void SetRespawnLocation(int x, int y, GameBoard board) {
             respawnPoint.X = x;
             respawnPoint.Y = y;

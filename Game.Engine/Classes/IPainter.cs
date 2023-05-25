@@ -4,8 +4,9 @@ namespace Ira.Game {
     public interface IPainter {
         void Clear();
         void DrawBoard(GameBoard board, Player player, List<Enemy> enemies);
-        void DrawStart();
+        void DrawStart(int selectedItem);
         void DrawLose();
         void DrawWin();
+        void DrawShop(int selectedItem);
     }
 }

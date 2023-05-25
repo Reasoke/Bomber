@@ -34,7 +34,8 @@ namespace Ira.Game {
         }
 
         public static void PlaySoundMove() {
-            Console.Beep(1000, 50);
+            player.SoundLocation = ".\\media\\move.wav";
+            player.Play();
         }
 
         public static void PlaySoundExit() {
