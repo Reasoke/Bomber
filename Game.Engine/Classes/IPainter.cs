@@ -7,6 +7,6 @@ namespace Ira.Game {
         void DrawStart(int selectedItem);
         void DrawLose();
         void DrawWin();
-        void DrawShop(int selectedItem);
+        void DrawShop(int selectedItem, Player player);
     }
 }

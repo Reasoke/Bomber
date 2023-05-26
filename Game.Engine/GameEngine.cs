@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 
 namespace Ira.Game {
     public class GameEngine {
@@ -72,33 +73,51 @@ namespace Ira.Game {
                             break;
 
                         case ControllerActions.Start:
+                            bool restartShop = false;
                             switch (currentSelectedItem) {
                                 case 0:
-                                    //todo: check and take coins if it has
-                                    player.AddLife();
+                                    if (player.Score >= 5) {
+                                        player.Score -= 5;
+                                        player.AddLife();
+                                    }
+                                    else restartShop = true;
                                     break;
                                 case 1:
-                                    player.AddBomb();
+                                    if (player.Score >= 3) {
+                                        player.Score -= 3;                                   
+                                        player.AddBomb();
+                                    }
+                                    else restartShop = true;
                                     break;
                                 case 2:
-                                    player.AddBombPower();
+                                    if (player.Score >= 3) {
+                                        player.Score -= 3;                                   
+                                        player.AddBombPower();
+                                    }
+                                    else restartShop = true;
                                     break;
                                 case 3:
-                                    player.IsProtected = true;
+                                    if (player.Score >= 4) {
+                                        player.Score -= 4;                                   
+                                        player.IsProtected = true;
+                                    }
+                                    else restartShop = true;
                                     break;
                             }
-                            
-                            if (currentLevel < 5) {
-                                State = GameStates.Game;
-                                currentLevel++;
-                                StartLevel();
-                            }
-                            else {
-                                //no more levels supported
-                                State = GameStates.Start;
-                                Start();
-                            }
 
+                            if (!restartShop) {
+                                if (currentLevel < 5) {
+                                    State = GameStates.Game;
+                                    currentLevel++;
+                                    StartLevel();
+                                }
+                                else {
+                                    //no more levels supported
+                                    State = GameStates.Start;
+                                    Start();
+                                }
+                            }
+                            else Utils.PlaySoundError();
                             break;
                     }
                     break;
@@ -177,7 +196,7 @@ namespace Ira.Game {
         public void Shop() {
             if (currentSelectedItem < 0) currentSelectedItem = 4;
             if (currentSelectedItem > 4) currentSelectedItem = 0;
-            painter.DrawShop(currentSelectedItem);
+            painter.DrawShop(currentSelectedItem, player);
             Utils.PlaySoundMove();
         }
 

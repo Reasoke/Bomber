@@ -159,7 +159,7 @@ namespace Ira.Game {
             Console.Write("Нажмите Enter для запуска следующего уровня...");
         }
 
-        public void DrawShop(int selectedItem) {
+        public void DrawShop(int selectedItem, Player player) {
             Console.Clear();
             ColorConsole.WriteLine("SHOP", ConsoleColor.Cyan);
             Console.WriteLine();
@@ -168,6 +168,9 @@ namespace Ira.Game {
             ColorConsole.WriteLine("bomb power", selectedItem == 2 ? ConsoleColor.Yellow : ConsoleColor.DarkGray);
             ColorConsole.WriteLine("armor", selectedItem == 3 ? ConsoleColor.Yellow : ConsoleColor.DarkGray);
             ColorConsole.WriteLine("nothing", selectedItem == 4 ? ConsoleColor.Yellow : ConsoleColor.DarkGray);
+            Console.WriteLine();
+            Console.Title =
+                $"{Title} (player position: {player.Position.X} - {player.Position.Y}) Player Score: {player.Score} Player Lives: {player.LivesCount}";
 
         }
 

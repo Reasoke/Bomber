@@ -150,11 +150,13 @@ namespace Ira.Game {
             pictureBox.ImageLocation = "./media/win.png";
         }
 
-        public void DrawShop(int selectedItem) {
+        public void DrawShop(int selectedItem, Player player) {
             var image = new Bitmap("./media/shop.png");
+            var score = $"Pomb limit: {player.BombsLimit}; Pomb power: {player.BombPower}; Score: {player.Score}; Lives: {player.LivesCount}; Has armor: {player.IsProtected}";
             using (var g = Graphics.FromImage(image)) {
+                g.DrawString(score, new Font("Tahoma", 20), Brushes.Black, 10, image.Height - 50);
                 DrawImageStretched(g, shopSelectorImage,
-                    new Rectangle(100, 200 + 130 * selectedItem, shopSelectorImage.Width, shopSelectorImage.Height));
+                    new Rectangle(905, 205 + 145 * selectedItem, shopSelectorImage.Width, shopSelectorImage.Height));
             }
             pictureBox.Image = image;
         }

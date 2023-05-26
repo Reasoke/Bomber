@@ -47,5 +47,10 @@ namespace Ira.Game {
             player.SoundLocation = ".\\media\\kill.wav";
             player.Play();
         }
+        
+        public static void PlaySoundError() {
+            player.SoundLocation = ".\\media\\error.wav";
+            player.Play();
+        }
     }
 }
