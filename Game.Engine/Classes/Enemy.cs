@@ -2,14 +2,17 @@
 using System.Collections.Generic;
 using System.Drawing;
 
-namespace Ira.Game {
-    public class Enemy : Character {
+namespace Ira.Game
+{
+    public class Enemy : Character
+    {
         private MoveDirection moveDirection;
 
         public readonly int Smartness;
         public Point PreviousPosition;
 
-        public Enemy(int x, int y, GameBoard board, int smartness) : base(x, y, board) {
+        public Enemy(int x, int y, GameBoard board, int smartness) : base(x, y, board)
+        {
             Smartness = smartness;
             PreviousPosition.X = x;
             PreviousPosition.Y = y;
@@ -18,20 +21,24 @@ namespace Ira.Game {
             moveDirection = (MoveDirection) nextDir;
         }
 
-        protected override void InternalMove() {
+        protected override void InternalMove()
+        {
             var moved = false;
             int tries = 0;
             // var direction = ((MoveDirection[])Enum.GetValues(typeof(MoveDirection))).ToList();
-            var direction = new List<MoveDirection> {
+            var direction = new List<MoveDirection>
+            {
                 MoveDirection.Up,
                 MoveDirection.Right,
                 MoveDirection.Down,
                 MoveDirection.Left
             };
-            while (!moved) {
+            while (!moved)
+            {
                 var nextX = Position.X;
                 var nextY = Position.Y;
-                switch (moveDirection) {
+                switch (moveDirection)
+                {
                     case MoveDirection.Up:
                         nextY = Position.Y - 1;
                         PreviousPosition.Y = Position.Y;
@@ -50,25 +57,31 @@ namespace Ira.Game {
                         break;
                 }
 
-                if (this.Smartness == 1 && board[Position.X, Position.Y] == null && Utils.GetRandome(1, 10) == 7) {
+                if (this.Smartness == 1 && board[Position.X, Position.Y] == null && Utils.GetRandome(1, 10) == 7)
+                {
                     board[Position.X, Position.Y] = new Trap(board.StepNumber);
                 }
 
-                if (TryMoveTo(nextX, nextY)) {
+                if (TryMoveTo(nextX, nextY))
+                {
                     moved = true;
                 }
-                else {
+                else
+                {
                     tries = ChooseDirection(tries, direction);
-                    if (tries == 4) {
+                    if (tries == 4)
+                    {
                         break;
                     }
                 }
             }
         }
 
-        public int ChooseDirection(int tries, List<MoveDirection> direction) {
+        public int ChooseDirection(int tries, List<MoveDirection> direction)
+        {
             int nextDir;
-            switch (Smartness) {
+            switch (Smartness)
+            {
                 case 0:
                     nextDir = Utils.GetRandome(0, 3);
                     moveDirection = direction[nextDir];
@@ -85,9 +98,12 @@ namespace Ira.Game {
             return ++tries;
         }
 
-        public void InteractWithBoard() {
-            switch (board[Position.X, Position.Y]) {
-                case Armor a: {
+        public void InteractWithBoard()
+        {
+            switch (board[Position.X, Position.Y])
+            {
+                case Armor a:
+                {
                     this.IsProtected = true;
                     board[Position.X, Position.Y] = null;
                     break;

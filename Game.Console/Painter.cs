@@ -2,29 +2,38 @@
 using System.Collections.Generic;
 using System.IO;
 
-namespace Ira.Game {
-    public class Painter : IPainter {
+namespace Ira.Game
+{
+    public class Painter : IPainter
+    {
         private const string Title = "Bomberfox";
 
-        public Painter() {
+        public Painter()
+        {
             Console.CursorVisible = false;
         }
 
-        public void Clear() {
+        public void Clear()
+        {
             Console.Clear();
         }
 
-        public void DrawBoard(GameBoard board, Player player, List<Enemy> enemies) {
+        public void DrawBoard(GameBoard board, Player player1, Player player2, List<Enemy> enemies, bool player1Move)
+        {
             Console.SetCursorPosition(0, 0);
 
             Console.Title =
-                $"{Title} (player position: {player.Position.X} - {player.Position.Y}) Player Score: {player.Score} Player Lives: {player.LivesCount}";
+                $"{Title} (player position: {player1.Position.X} - {player1.Position.Y}) Player Score: {player1.Score} Player Lives: {player1.LivesCount}";
 
-            for (var y = 0; y < board.Height; y++) {
+            for (var y = 0; y < board.Height; y++)
+            {
                 ColorConsole.Write("\t");
-                for (var x = 0; x < board.Width; x++) {
-                    switch (board[x, y]) {
-                        case PermanentWall el: {
+                for (var x = 0; x < board.Width; x++)
+                {
+                    switch (board[x, y])
+                    {
+                        case PermanentWall el:
+                        {
                             var wUp = y - 1 >= 0 &&
                                       board[x, y - 1] is PermanentWall; // array[x, y - 1] == Wall - сравнение
                             var wDown = y + 1 < board.Height && board[x, y + 1] is PermanentWall;
@@ -32,52 +41,68 @@ namespace Ira.Game {
                             var wRight = x + 1 < board.Width && board[x + 1, y] is PermanentWall;
 
 
-                            if (wUp && wDown && wLeft && wRight) {
+                            if (wUp && wDown && wLeft && wRight)
+                            {
                                 ColorConsole.Write("┼");
                             }
-                            else if (wUp && wDown && wLeft) {
+                            else if (wUp && wDown && wLeft)
+                            {
                                 ColorConsole.Write("┤");
                             }
-                            else if (wUp && wDown && wRight) {
+                            else if (wUp && wDown && wRight)
+                            {
                                 ColorConsole.Write("├");
                             }
-                            else if (wUp && wDown) {
+                            else if (wUp && wDown)
+                            {
                                 ColorConsole.Write("│");
                             }
-                            else if (wUp && wLeft && wRight) {
+                            else if (wUp && wLeft && wRight)
+                            {
                                 ColorConsole.Write("┴");
                             }
-                            else if (wUp && wLeft) {
+                            else if (wUp && wLeft)
+                            {
                                 ColorConsole.Write("┘");
                             }
-                            else if (wUp && wRight) {
+                            else if (wUp && wRight)
+                            {
                                 ColorConsole.Write("└");
                             }
-                            else if (wUp) {
+                            else if (wUp)
+                            {
                                 ColorConsole.Write("│");
                             }
-                            else if (wDown && wLeft && wRight) {
+                            else if (wDown && wLeft && wRight)
+                            {
                                 ColorConsole.Write("┬");
                             }
-                            else if (wDown && wLeft) {
+                            else if (wDown && wLeft)
+                            {
                                 ColorConsole.Write("┐");
                             }
-                            else if (wDown && wRight) {
+                            else if (wDown && wRight)
+                            {
                                 ColorConsole.Write("┌");
                             }
-                            else if (wDown) {
+                            else if (wDown)
+                            {
                                 ColorConsole.Write("│");
                             }
-                            else if (wLeft && wRight) {
+                            else if (wLeft && wRight)
+                            {
                                 ColorConsole.Write("─");
                             }
-                            else if (wLeft) {
+                            else if (wLeft)
+                            {
                                 ColorConsole.Write("─");
                             }
-                            else if (wRight) {
+                            else if (wRight)
+                            {
                                 ColorConsole.Write("─");
                             }
-                            else {
+                            else
+                            {
                                 ColorConsole.Write("■");
                             }
 
@@ -127,7 +152,8 @@ namespace Ira.Game {
                 ColorConsole.WriteLine();
             }
 
-            foreach (var enemy in enemies) {
+            foreach (var enemy in enemies)
+            {
                 var enemySymbol = enemy is IntelligentEnemy ? "I" :
                     enemy is Ghost ? "G" :
                     enemy.Smartness == 1 ? "S" : "E";
@@ -138,28 +164,38 @@ namespace Ira.Game {
                     ColorConsole.Write(enemySymbol, ConsoleColor.DarkRed);
             }
 
-            Console.SetCursorPosition(player.Position.X + 8, player.Position.Y);
+            Console.SetCursorPosition(player1.Position.X + 8, player1.Position.Y);
             ColorConsole.Write("P", ConsoleColor.Blue);
+            if (player2 != null)
+            {
+                Console.SetCursorPosition(player2.Position.X + 8, player2.Position.Y);
+                ColorConsole.Write("Q", ConsoleColor.Blue);
+            }
         }
 
-        public void DrawStart(int selectedItem) {
+        public void DrawStart(int selectedItem)
+        {
             const string fileName = ".\\media\\StartScreen.txt";
             var fileLines = File.ReadAllLines(fileName);
             DrawScreen(fileLines);
-            ColorConsole.WriteLine("start", selectedItem == 0 ? ConsoleColor.Yellow : ConsoleColor.DarkGray);
-            ColorConsole.WriteLine("options", selectedItem == 1 ? ConsoleColor.Yellow : ConsoleColor.DarkGray);
-            ColorConsole.WriteLine("exit", selectedItem == 2 ? ConsoleColor.Yellow : ConsoleColor.DarkGray);
+            ColorConsole.WriteLine("1 player", selectedItem == 0 ? ConsoleColor.Yellow : ConsoleColor.DarkGray);
+            ColorConsole.WriteLine("2 players", selectedItem == 1 ? ConsoleColor.Yellow : ConsoleColor.DarkGray);
+            ColorConsole.WriteLine("start net", selectedItem == 2 ? ConsoleColor.Yellow : ConsoleColor.DarkGray);
+            ColorConsole.WriteLine("connect", selectedItem == 3 ? ConsoleColor.Yellow : ConsoleColor.DarkGray);
+            ColorConsole.WriteLine("exit", selectedItem == 4 ? ConsoleColor.Yellow : ConsoleColor.DarkGray);
             // Console.Write("Нажмите Enter для начала игры или Escape для выхода...");
         }
 
-        public void DrawWin() {
+        public void DrawWin()
+        {
             const string fileName = ".\\media\\WinScreen.txt";
             var fileLines = File.ReadAllLines(fileName);
             DrawScreen(fileLines);
             Console.Write("Нажмите Enter для запуска следующего уровня...");
         }
 
-        public void DrawShop(int selectedItem, Player player) {
+        public void DrawShop(int selectedItem, Player player)
+        {
             Console.Clear();
             ColorConsole.WriteLine("SHOP", ConsoleColor.Cyan);
             Console.WriteLine();
@@ -171,24 +207,32 @@ namespace Ira.Game {
             Console.WriteLine();
             Console.Title =
                 $"{Title} (player position: {player.Position.X} - {player.Position.Y}) Player Score: {player.Score} Player Lives: {player.LivesCount}";
-
         }
 
-        public void DrawLose() {
+        public void DrawMessageScreen(string text)
+        {
+            ColorConsole.WriteLine(text);
+        }
+
+        public void DrawLose()
+        {
             const string fileName = ".\\media\\DieScreen.txt";
             var fileLines = File.ReadAllLines(fileName);
             DrawScreen(fileLines);
             Console.Write("Нажмите Enter для запуска новой игры или Escape для выхода...");
         }
 
-        private void DrawScreen(string[] fileLines) {
+        private void DrawScreen(string[] fileLines)
+        {
             Console.Clear();
             var height = fileLines.Length;
-            for (var y = 0; y < height; y++) {
+            for (var y = 0; y < height; y++)
+            {
                 // перебираем все файловые строки
                 var line = fileLines[y];
                 ColorConsole.Write("\t");
-                for (var x = 0; x < line.Length; x++) {
+                for (var x = 0; x < line.Length; x++)
+                {
                     //перебираем все символы строки
                     Console.Write(line[x]);
                 }

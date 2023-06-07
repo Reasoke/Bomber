@@ -2,8 +2,10 @@
 using System.Drawing;
 using System.Linq;
 
-namespace Ira.Game {
-    public class Player : Character {
+namespace Ira.Game
+{
+    public class Player : Character
+    {
         private Point respawnPoint;
 
         public int BombPower { get; private set; }
@@ -13,31 +15,39 @@ namespace Ira.Game {
 
         public bool IsWinner { get; set; }
 
-        public Player(int x, int y, GameBoard board, int lives) : base(x, y, board, lives) {
+        public Player(int x, int y, GameBoard board, int lives) : base(x, y, board, lives)
+        {
             LivesCount = lives;
             SetRespawnLocation(x, y, board);
             SetDefaults();
         }
 
-        public void AddLife() {
+        public void AddLife()
+        {
             LivesCount++;
         }
-        public void AddBomb() {
-            BombsLimit++;
+
+        public void AddBomb(int count = 1)
+        {
+            BombsLimit += count;
         }
-        public void AddBombPower() {
+
+        public void AddBombPower()
+        {
             BombPower++;
         }
-        
-        
-        public void SetRespawnLocation(int x, int y, GameBoard board) {
+
+
+        public void SetRespawnLocation(int x, int y, GameBoard board)
+        {
             respawnPoint.X = x;
             respawnPoint.Y = y;
             Position = new Point(x, y);
             base.board = board;
         }
 
-        private void SetDefaults() {
+        private void SetDefaults()
+        {
             BombsLimit = 1;
             BombPower = 2;
             BombsUsed = 0;
@@ -45,13 +55,16 @@ namespace Ira.Game {
             Position = new Point(respawnPoint.X, respawnPoint.Y);
         }
 
-        protected override void PositionChanged() {
+        protected override void PositionChanged()
+        {
             base.PositionChanged();
             Utils.PlaySoundMove();
         }
 
-        protected override void InternalMove() {
-            switch (MoveDirection) {
+        protected override void InternalMove()
+        {
+            switch (MoveDirection)
+            {
                 case MoveDirection.None:
                     //stay here
                     break;
@@ -72,66 +85,85 @@ namespace Ira.Game {
             MoveDirection = MoveDirection.None;
         }
 
-        public void SetTheBomb() {
+        public void SetTheBomb(int ticks)
+        {
             if (BombsUsed >= BombsLimit) return;
-            if (board.AddTheBomb(Position.X, Position.Y, BombPower)) {
+            if (board.AddTheBomb(Position.X, Position.Y, BombPower, ticks))
+            {
                 BombsUsed++;
             }
         }
 
-        public void InteractWithBoard(List<Enemy> enemies) {
-            switch (board[Position.X, Position.Y]) {
-                case Coins c: {
+        public void InteractWithBoard(List<Enemy> enemies)
+        {
+            switch (board[Position.X, Position.Y])
+            {
+                case Coins c:
+                {
                     this.Score++;
                     board[Position.X, Position.Y] = null;
                     break;
                 }
-                case BombCountBonus c: {
+                case BombCountBonus c:
+                {
                     this.BombsLimit++;
                     board[Position.X, Position.Y] = null;
                     break;
                 }
-                case BombPowerBonus c: {
+                case BombPowerBonus c:
+                {
                     this.BombPower++;
                     board[Position.X, Position.Y] = null;
                     break;
                 }
-                case Armor a: {
+                case Armor a:
+                {
                     this.IsProtected = true;
                     board[Position.X, Position.Y] = null;
                     break;
                 }
-                case Finish f: {
-                    if (f.ExitMode) {
+                case Finish f:
+                {
+                    if (f.ExitMode)
+                    {
                         IsWinner = true;
                     }
 
                     break;
                 }
-                case Fire f: {
+                case Fire f:
+                {
                     if (!IsProtected) this.Die();
                     break;
                 }
-                case Trap t: {
+                case Trap t:
+                {
                     if (!IsProtected) this.Die();
                     break;
                 }
             }
 
-            if (enemies.Any(e => (e.Position.X == Position.X && e.Position.Y == Position.Y) || (e.PreviousPosition.X == Position.X && e.PreviousPosition.Y == Position.Y))) {
-                if (IsProtected) {
+            if (enemies.Any(e =>
+                    (e.Position.X == Position.X && e.Position.Y == Position.Y) ||
+                    (e.PreviousPosition.X == Position.X && e.PreviousPosition.Y == Position.Y)))
+            {
+                if (IsProtected)
+                {
                     IsProtected = false;
                 }
-                else {
+                else
+                {
                     Die();
                 }
             }
         }
 
-        public bool Die() {
+        public bool Die()
+        {
             LivesCount--;
             Utils.PlaySoundKill();
-            if (IsAlive) {
+            if (IsAlive)
+            {
                 SetDefaults();
                 return false;
             }

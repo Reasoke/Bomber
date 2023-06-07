@@ -1,12 +1,15 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 
-namespace Ira.Game {
-    public class Painter: IPainter {
-
+namespace Ira.Game
+{
+    public class Painter : IPainter
+    {
         private readonly PictureBox pictureBox;
         private readonly Image playerImage;
+        private readonly Image player2Image;
         private readonly Image enemyImage;
         private readonly Image enemy2Image;
         private readonly Image ghostImage;
@@ -24,32 +27,36 @@ namespace Ira.Game {
         private readonly Image selectorImage;
         private readonly Image shopSelectorImage;
 
-        public Painter(PictureBox pictureBox) {
+        public Painter(PictureBox pictureBox)
+        {
             this.pictureBox = pictureBox;
-            playerImage =  Image.FromFile("./media/player.png");
-            enemyImage =  Image.FromFile("./media/enemy.png");
-            enemy2Image =  Image.FromFile("./media/enemy2.png");
-            ghostImage =  Image.FromFile("./media/ghost.png");
-            wallImage =  Image.FromFile("./media/wall.jpg");
-            wall2Image =  Image.FromFile("./media/wall2.jpg");
-            coinImage =  Image.FromFile("./media/coin.png");
-            bombImage =  Image.FromFile("./media/bomb.png");
-            exitImage =  Image.FromFile("./media/exit.png");
-            exitLockedImage =  Image.FromFile("./media/exitLocked.png");
-            armorImage =  Image.FromFile("./media/armor.png");
-            fireImage =  Image.FromFile("./media/fire.png");
-            trapImage =  Image.FromFile("./media/trap.png");
-            bombCountImage =  Image.FromFile("./media/bombCount.png");
-            bombPowerImage =  Image.FromFile("./media/bombPower.png");
-            selectorImage =  Image.FromFile("./media/selector.png");
-            shopSelectorImage =  Image.FromFile("./media/shopSelector.png");
+            playerImage = Image.FromFile("./media/player.png");
+            player2Image = Image.FromFile("./media/player2.png");
+            enemyImage = Image.FromFile("./media/enemy.png");
+            enemy2Image = Image.FromFile("./media/enemy2.png");
+            ghostImage = Image.FromFile("./media/ghost.png");
+            wallImage = Image.FromFile("./media/wall.jpg");
+            wall2Image = Image.FromFile("./media/wall2.jpg");
+            coinImage = Image.FromFile("./media/coin.png");
+            bombImage = Image.FromFile("./media/bomb.png");
+            exitImage = Image.FromFile("./media/exit.png");
+            exitLockedImage = Image.FromFile("./media/exitLocked.png");
+            armorImage = Image.FromFile("./media/armor.png");
+            fireImage = Image.FromFile("./media/fire.png");
+            trapImage = Image.FromFile("./media/trap.png");
+            bombCountImage = Image.FromFile("./media/bombCount.png");
+            bombPowerImage = Image.FromFile("./media/bombPower.png");
+            selectorImage = Image.FromFile("./media/selector.png");
+            shopSelectorImage = Image.FromFile("./media/shopSelector.png");
         }
-        
-        private void DrawEnemy(Graphics g, Rectangle rect, Enemy e) {
-            if (e.IsProtected) 
+
+        private void DrawEnemy(Graphics g, Rectangle rect, Enemy e)
+        {
+            if (e.IsProtected)
                 g.FillRectangle(new SolidBrush(Color.Magenta), rect);
 
-            switch (e) {
+            switch (e)
+            {
                 case Ghost _:
                     DrawImageStretched(g, ghostImage, rect);
                     break;
@@ -64,24 +71,34 @@ namespace Ira.Game {
             }
         }
 
-        private static void DrawImageStretched(Graphics g, Image image, Rectangle rect) {
+        private static void DrawImageStretched(Graphics g, Image image, Rectangle rect)
+        {
             g.DrawImage(image, rect, new Rectangle(0, 0, image.Width, image.Height), GraphicsUnit.Pixel);
         }
-        
-        public void DrawBoard(GameBoard board, Player player, List<Enemy> enemies) {
+
+        public void DrawBoard(GameBoard board, Player player1, Player player2, List<Enemy> enemies, bool player1Move)
+        {
+            if (pictureBox.InvokeRequired)
+            {
+                pictureBox.Invoke(new Action(() => DrawBoard(board, player1, player2, enemies, player1Move)));
+                return;
+            }
+            
             const int cellHeight = 100;
             const int cellWidth = 100;
             const int scorePanelHeight = 60;
             var image = new Bitmap(board.Width * cellWidth, board.Height * cellHeight + scorePanelHeight);
-            var score = $"Pomb limit: {player.BombsLimit}; Pomb power: {player.BombPower}; Score: {player.Score}; Lives: {player.LivesCount}; Has armor: {player.IsProtected}";
-            using (var g = Graphics.FromImage(image)) {
+            using (var g = Graphics.FromImage(image))
+            {
                 g.Clear(Color.Gainsboro);
-                g.DrawString(score, new Font("Tahoma", 20), Brushes.Black, 0, board.Height * cellHeight + 20);
-                for (var y = 0; y < board.Height; y++) {
-                    for (var x = 0; x < board.Width; x++) {
+                for (var y = 0; y < board.Height; y++)
+                {
+                    for (var x = 0; x < board.Width; x++)
+                    {
                         var item = board[x, y];
                         var rect = new Rectangle(x * cellWidth, y * cellHeight, cellWidth, cellHeight);
-                        switch (item) {
+                        switch (item)
+                        {
                             case PermanentWall _:
                                 DrawImageStretched(g, wallImage, rect);
                                 break;
@@ -117,51 +134,94 @@ namespace Ira.Game {
                     }
                 }
 
-                foreach (var enemy in enemies) {
-                    DrawEnemy(g, new Rectangle(enemy.Position.X * cellWidth, enemy.Position.Y * cellHeight, 
+                foreach (var enemy in enemies)
+                {
+                    DrawEnemy(g, new Rectangle(enemy.Position.X * cellWidth, enemy.Position.Y * cellHeight,
                         cellWidth, cellHeight), enemy);
                 }
 
-                var pRect = new Rectangle(player.Position.X * cellWidth, player.Position.Y * cellHeight, cellWidth,
+                var pRect = new Rectangle(player1.Position.X * cellWidth, player1.Position.Y * cellHeight, cellWidth,
                     cellHeight);
-                if (player.IsProtected) 
+                if (player1.IsProtected)
                     g.FillRectangle(new SolidBrush(Color.Magenta), pRect);
                 DrawImageStretched(g, playerImage, pRect);
+
+                var score =
+                    $"Lives: {player1.LivesCount}; Bombs: {player1.BombsLimit}; Power: {player1.BombPower}; Armor: {player1.IsProtected}; Score: {player1.Score}";
+                g.DrawString(score, new Font("Tahoma", 18), Brushes.Black, 0, board.Height * cellHeight + 20);
+
+                if (player2 != null)
+                {
+                    var p2Rect = new Rectangle(player2.Position.X * cellWidth, player2.Position.Y * cellHeight,
+                        cellWidth,
+                        cellHeight);
+                    if (player2.IsProtected)
+                        g.FillRectangle(new SolidBrush(Color.Magenta), p2Rect);
+                    DrawImageStretched(g, player2Image, p2Rect);
+                    var score2 =
+                        $"Lives: {player2.LivesCount}; Bombs: {player2.BombsLimit}; Power: {player2.BombPower}; Armor: {player2.IsProtected}; Score: {player2.Score}";
+                    g.DrawString(score2, new Font("Tahoma", 18), Brushes.Black, board.Width / 2 * cellWidth + 70,
+                        board.Height * cellHeight + 20);
+                }
+
+                g.DrawString(player1Move ? "⇦" : "⇨", new Font("Tahoma", 40, FontStyle.Bold), Brushes.Red,
+                    board.Width / 2 * cellWidth, board.Height * cellHeight);
             }
 
             pictureBox.Image = image;
         }
 
-        public void DrawStart(int selectedItem) {
+        public void DrawStart(int selectedItem)
+        {
             // pictureBox.ImageLocation = "./media/start.png";
             var image = new Bitmap("./media/start.png");
-            using (var g = Graphics.FromImage(image)) {
+            using (var g = Graphics.FromImage(image))
+            {
                 DrawImageStretched(g, selectorImage,
-                    new Rectangle(825, 585 + 130 * selectedItem, selectorImage.Width, selectorImage.Height));
+                    new Rectangle(630, 480 + 115 * selectedItem, selectorImage.Width, selectorImage.Height));
             }
+
             pictureBox.Image = image;
         }
 
-        public void DrawLose() {
+        public void DrawLose()
+        {
             pictureBox.ImageLocation = "./media/die.png";
         }
 
-        public void DrawWin() {
+        public void DrawWin()
+        {
             pictureBox.ImageLocation = "./media/win.png";
         }
 
-        public void DrawShop(int selectedItem, Player player) {
+        public void DrawShop(int selectedItem, Player player)
+        {
             var image = new Bitmap("./media/shop.png");
-            var score = $"Pomb limit: {player.BombsLimit}; Pomb power: {player.BombPower}; Score: {player.Score}; Lives: {player.LivesCount}; Has armor: {player.IsProtected}";
-            using (var g = Graphics.FromImage(image)) {
+            var score =
+                $"Pomb limit: {player.BombsLimit}; Pomb power: {player.BombPower}; Score: {player.Score}; Lives: {player.LivesCount}; Has armor: {player.IsProtected}";
+            using (var g = Graphics.FromImage(image))
+            {
                 g.DrawString(score, new Font("Tahoma", 20), Brushes.Black, 10, image.Height - 50);
                 DrawImageStretched(g, shopSelectorImage,
                     new Rectangle(905, 205 + 145 * selectedItem, shopSelectorImage.Width, shopSelectorImage.Height));
             }
+
             pictureBox.Image = image;
         }
 
-        public void Clear() {
+        public void DrawMessageScreen(string text)
+        {
+            var image = new Bitmap("./media/statusScreen.png");
+            using (var g = Graphics.FromImage(image))
+            {
+                g.DrawString(text, new Font("Tahoma", 26), Brushes.White, 300, image.Height / 2);
+            }
+
+            pictureBox.Image = image;
+        }
+
+        public void Clear()
+        {
             // Redraw();
         }
     }

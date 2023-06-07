@@ -1,5 +1,7 @@
-﻿namespace Ira.Game {
-    public enum MoveDirection {
+﻿namespace Ira.Game
+{
+    public enum MoveDirection
+    {
         None,
         Up,
         Right,
