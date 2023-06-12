@@ -1,6 +1,6 @@
 ﻿namespace Ira.Game
 {
-    public enum ControllerActions
+    public enum ControllerAction
     {
         Player1Up,
         Player1Down,

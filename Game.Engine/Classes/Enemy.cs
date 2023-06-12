@@ -21,7 +21,7 @@ namespace Ira.Game
             moveDirection = (MoveDirection) nextDir;
         }
 
-        protected override void InternalMove()
+        public virtual void Move()
         {
             var moved = false;
             int tries = 0;

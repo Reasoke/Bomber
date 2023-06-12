@@ -61,7 +61,7 @@ namespace Ira.Game
             Utils.PlaySoundMove();
         }
 
-        protected override void InternalMove()
+        public void Move()
         {
             switch (MoveDirection)
             {

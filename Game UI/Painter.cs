@@ -20,12 +20,15 @@ namespace Ira.Game
         private readonly Image exitImage;
         private readonly Image exitLockedImage;
         private readonly Image armorImage;
-        private readonly Image fireImage;
-        private readonly Image trapImage;
+        private readonly Image lifeImage;
         private readonly Image bombCountImage;
         private readonly Image bombPowerImage;
+        private readonly Image fireImage;
+        private readonly Image trapImage;
         private readonly Image selectorImage;
         private readonly Image shopSelectorImage;
+
+        private readonly Dictionary<ShopMenuItem, Image> shopMenuImages;
 
         public Painter(PictureBox pictureBox)
         {
@@ -38,16 +41,26 @@ namespace Ira.Game
             wallImage = Image.FromFile("./media/wall.jpg");
             wall2Image = Image.FromFile("./media/wall2.jpg");
             coinImage = Image.FromFile("./media/coin.png");
-            bombImage = Image.FromFile("./media/bomb.png");
             exitImage = Image.FromFile("./media/exit.png");
             exitLockedImage = Image.FromFile("./media/exitLocked.png");
+            bombImage = Image.FromFile("./media/bomb.png");
             armorImage = Image.FromFile("./media/armor.png");
-            fireImage = Image.FromFile("./media/fire.png");
-            trapImage = Image.FromFile("./media/trap.png");
             bombCountImage = Image.FromFile("./media/bombCount.png");
             bombPowerImage = Image.FromFile("./media/bombPower.png");
+            lifeImage = Image.FromFile("./media/life.png");
+            trapImage = Image.FromFile("./media/trap.png");
+            fireImage = Image.FromFile("./media/fire.png");
             selectorImage = Image.FromFile("./media/selector.png");
             shopSelectorImage = Image.FromFile("./media/shopSelector.png");
+
+            shopMenuImages = new Dictionary<ShopMenuItem, Image>
+            {
+                {ShopMenuItem.Life, lifeImage},
+                {ShopMenuItem.BombCountBonus, bombImage},
+                {ShopMenuItem.BombPowerBonus, bombCountImage},
+                {ShopMenuItem.Armor, armorImage},
+                {ShopMenuItem.Nothing, playerImage},
+            };
         }
 
         private void DrawEnemy(Graphics g, Rectangle rect, Enemy e)
@@ -177,6 +190,14 @@ namespace Ira.Game
             var image = new Bitmap("./media/start.png");
             using (var g = Graphics.FromImage(image))
             {
+                
+                var i = 0;
+                foreach (var item in StartMenuHelper.StartMenuItems)
+                {
+                    g.DrawString(item.Value, new Font("Segoe UI", 40, FontStyle.Italic), Brushes.Black, 850, 500 + 115*i);
+                    i++;
+                }
+                
                 DrawImageStretched(g, selectorImage,
                     new Rectangle(630, 480 + 115 * selectedItem, selectorImage.Width, selectorImage.Height));
             }
@@ -201,6 +222,17 @@ namespace Ira.Game
                 $"Pomb limit: {player.BombsLimit}; Pomb power: {player.BombPower}; Score: {player.Score}; Lives: {player.LivesCount}; Has armor: {player.IsProtected}";
             using (var g = Graphics.FromImage(image))
             {
+                var i = 0;
+                foreach (var item in ShopHelper.Prices)
+                {
+                    DrawImageStretched(g, shopMenuImages[item.Key], new Rectangle(50, 205+i*145, 100, 100));
+                    g.DrawString(item.Key.ToTitle(), new Font("Segoe UI", 35, FontStyle.Italic), Brushes.Chocolate, 200, 205+i*145);
+                    g.DrawString(item.Value.ToString(), new Font("Segoe UI", 35, FontStyle.Italic), Brushes.Chocolate, 600, 205+i*145);
+                    DrawImageStretched(g, coinImage, new Rectangle(650, 205+i*145, 90, 80));
+                    
+                    i++;
+                }
+                
                 g.DrawString(score, new Font("Tahoma", 20), Brushes.Black, 10, image.Height - 50);
                 DrawImageStretched(g, shopSelectorImage,
                     new Rectangle(905, 205 + 145 * selectedItem, shopSelectorImage.Width, shopSelectorImage.Height));
@@ -208,7 +240,7 @@ namespace Ira.Game
 
             pictureBox.Image = image;
         }
-
+        
         public void DrawMessageScreen(string text)
         {
             var image = new Bitmap("./media/statusScreen.png");

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 
@@ -6,6 +7,10 @@ namespace Ira.Game
 {
     public class IntelligentEnemy : Enemy
     {
+        protected const int EmptySellCode = 0;
+        protected const int PlayerCode = -1;
+        protected const int BarrierCode = -2;
+        
         private readonly Player player;
 
         public IntelligentEnemy(int x, int y, GameBoard board, Player player) : base(x, y, board, 0)
@@ -13,62 +18,84 @@ namespace Ira.Game
             this.player = player;
         }
 
-        protected override void InternalMove()
+        public override void Move()
         {
-            var arr = GetArrayCopy(board, board.Width, board.Height);
-            arr[player.Position.X, player.Position.Y] = -1;
+            var arr = GetArrayCopy();
+            arr[player.Position.X, player.Position.Y] = PlayerCode;
             var input = new List<Point> {new Point(player.Position.X, player.Position.Y)};
-            CalcNextStep(arr, board.Width, board.Height, input, 1, Position);
+            CalcNextStep(input, 1);
 
-            if (IsValidMove(Position.X - 1, Position.Y, arr) ||
-                IsValidMove(Position.X + 1, Position.Y, arr) ||
-                IsValidMove(Position.X, Position.Y - 1, arr) ||
-                IsValidMove(Position.X, Position.Y + 1, arr))
+            var moved = TryMoveTo(Position.X - 1, Position.Y, arr) ||
+                        TryMoveTo(Position.X + 1, Position.Y, arr) ||
+                        TryMoveTo(Position.X, Position.Y - 1, arr) ||
+                        TryMoveTo(Position.X, Position.Y + 1, arr);
+
+
+
+            void CalcNextStep(List<Point> previousWavePoints, int step)
             {
-                //moved
-            }
-        }
+                var nextWavePoints = new List<Point>();
 
-        protected virtual bool IsValidMove(int x, int y, int[,] arr)
-        {
-            return (arr[x, y] > 0 || arr[x, y] == -1) && TryMoveTo(x, y);
-        }
-
-        private static void CheckPoint(int x, int y, int[,] array, int width, int height, List<Point> points, int step)
-        {
-            if (x < 0 || y < 0 || x >= width || y >= height || array[x, y] != 0) return;
-            array[x, y] = step;
-            points.Add(new Point(x, y));
-        }
-
-        private static void CalcNextStep(int[,] array, int width, int height, List<Point> input, int step, Point target)
-        {
-            var points = new List<Point>();
-
-            foreach (var point in input)
-            {
-                CheckPoint(point.X, point.Y - 1, array, width, height, points, step);
-                CheckPoint(point.X, point.Y + 1, array, width, height, points, step);
-                CheckPoint(point.X - 1, point.Y, array, width, height, points, step);
-                CheckPoint(point.X + 1, point.Y, array, width, height, points, step);
-            }
-
-            if (points.Count == 0)
-                return; // выхода нет
-            if (points.Any(p => p.X == target.X && p.Y == target.Y))
-                return; // выход есть
-
-            CalcNextStep(array, width, height, points, step + 1, target);
-        }
-
-        protected virtual int[,] GetArrayCopy(GameBoard board, int width, int height)
-        {
-            var result = new int[width, height];
-            for (int y = 0; y < height; y++)
-            {
-                for (int x = 0; x < width; x++)
+                foreach (var point in previousWavePoints)
                 {
-                    result[x, y] = board[x, y] == null || !board[x, y].IsBarrier ? 0 : -2;
+                    ProcessNeighbour(point.X, point.Y - 1);
+                    ProcessNeighbour(point.X, point.Y + 1);
+                    ProcessNeighbour(point.X - 1, point.Y);
+                    ProcessNeighbour(point.X + 1, point.Y);
+                }
+
+                if (nextWavePoints.Count == 0)
+                    return; // выхода нет
+
+                var findFinish = FindAny(nextWavePoints, p => p.X == Position.X && p.Y == Position.Y);
+                if (findFinish)
+                {
+                    return;
+                }
+
+                //Better to use Any, but it was a task not to do it
+                // if (nextWavePoints.Any(p => p.X == Position.X && p.Y == Position.Y))
+                //     return; // выход есть
+
+                CalcNextStep(nextWavePoints, step + 1);
+
+                void ProcessNeighbour(int x, int y)
+                {
+                    if (x < 0 || y < 0 || x >= board.Width || y >= board.Height || arr[x, y] != EmptySellCode) return;
+                    arr[x, y] = step;
+                    nextWavePoints.Add(new Point(x, y));
+                }
+            }
+        }
+
+        // private delegate bool Function(Point p);
+        // private bool FindAny(List<Point> points, Function f)
+        
+        private bool FindAny(List<Point> points, Func<Point, bool> CheckFinish)
+        {
+            foreach (var point in points)
+            {
+                if (CheckFinish(point))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+        
+        protected virtual bool TryMoveTo(int x, int y, int[,] arr)
+        {
+            return (arr[x, y] > EmptySellCode || arr[x, y] == PlayerCode) && base.TryMoveTo(x, y);
+        }
+
+        protected virtual int[,] GetArrayCopy()
+        {
+            var result = new int[board.Width, board.Height];
+            for (int y = 0; y < board.Height; y++)
+            {
+                for (int x = 0; x < board.Width; x++)
+                {
+                    result[x, y] = board[x, y] == null || !board[x, y].IsBarrier ? EmptySellCode : BarrierCode;
                 }
             }
 

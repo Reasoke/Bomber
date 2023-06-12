@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Ira.Game
 {
@@ -8,61 +9,30 @@ namespace Ira.Game
         {
             var painter = new Painter();
             var game = new GameEngine(painter);
+            Dictionary<ConsoleKey, ControllerAction> keyEvents = new Dictionary<ConsoleKey, ControllerAction>
+            {
+                {ConsoleKey.UpArrow, ControllerAction.Player1Up},
+                {ConsoleKey.DownArrow, ControllerAction.Player1Down},
+                {ConsoleKey.RightArrow, ControllerAction.Player1Right},
+                {ConsoleKey.LeftArrow, ControllerAction.Player1Left},
+                {ConsoleKey.Spacebar, ControllerAction.Player1Bomb},
+                {ConsoleKey.Escape, ControllerAction.Player1Exit},
+                {ConsoleKey.Enter, ControllerAction.Player1Start},
+                {ConsoleKey.W, ControllerAction.Player2Up},
+                {ConsoleKey.S, ControllerAction.Player2Down},
+                {ConsoleKey.D, ControllerAction.Player2Right},
+                {ConsoleKey.A, ControllerAction.Player2Left},
+                {ConsoleKey.E, ControllerAction.Player2Bomb},
+                {ConsoleKey.Q, ControllerAction.Player2Exit},
+                {ConsoleKey.F, ControllerAction.Player2Start},
+            };
+
             while (true)
             {
                 //keyboard
                 var key = Console.ReadKey(true);
-                switch (key.Key)
-                {
-                    case ConsoleKey.UpArrow:
-                        game.ProcessAction(ControllerActions.Player1Up);
-                        break;
-                    case ConsoleKey.DownArrow:
-                        game.ProcessAction(ControllerActions.Player1Down);
-                        break;
-                    case ConsoleKey.RightArrow:
-                        game.ProcessAction(ControllerActions.Player1Right);
-                        break;
-                    case ConsoleKey.LeftArrow:
-                        game.ProcessAction(ControllerActions.Player1Left);
-                        break;
-                    case ConsoleKey.Spacebar:
-                        game.ProcessAction(ControllerActions.Player1Bomb);
-                        break;
-                    case ConsoleKey.Escape:
-                        game.ProcessAction(ControllerActions.Player1Exit);
-                        break;
-                    case ConsoleKey.Enter:
-                        game.ProcessAction(ControllerActions.Player1Start);
-                        break;
-
-                    case ConsoleKey.W:
-                        game.ProcessAction(ControllerActions.Player2Up);
-                        break;
-                    case ConsoleKey.S:
-                        game.ProcessAction(ControllerActions.Player2Down);
-                        break;
-                    case ConsoleKey.D:
-                        game.ProcessAction(ControllerActions.Player2Right);
-                        break;
-                    case ConsoleKey.A:
-                        game.ProcessAction(ControllerActions.Player2Left);
-                        break;
-                    case ConsoleKey.E:
-                        game.ProcessAction(ControllerActions.Player2Bomb);
-                        break;
-                    case ConsoleKey.Q:
-                        game.ProcessAction(ControllerActions.Player2Exit);
-                        break;
-                    case ConsoleKey.F:
-                        game.ProcessAction(ControllerActions.Player2Start);
-                        break;
-
-                    default:
-                        game.ProcessAction(ControllerActions.Other);
-                        break;
-                }
-
+                if(keyEvents.TryGetValue(key.Key, out var action))
+                    game.ProcessAction(action);
                 //Clear keyboard buffer
                 while (Console.KeyAvailable)
                 {

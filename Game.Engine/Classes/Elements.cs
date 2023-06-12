@@ -55,6 +55,13 @@
         {
         }
     }
+    
+    public class Life : BaseItem
+    {
+        public Life() : base(isBarrier: false, isCollectable: true)
+        {
+        }
+    }
 
     public class Armor : BaseItem
     {

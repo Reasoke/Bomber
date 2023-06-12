@@ -12,16 +12,5 @@
             this.IsMovable = false;
             this.IsProtected = false;
         }
-
-        public void Move()
-        {
-            if (IsBarrier || !IsMovable) return;
-            InternalMove();
-        }
-
-        protected virtual void InternalMove()
-        {
-            //should be overwritten in children's
-        }
     }
 }

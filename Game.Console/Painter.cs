@@ -178,12 +178,14 @@ namespace Ira.Game
             const string fileName = ".\\media\\StartScreen.txt";
             var fileLines = File.ReadAllLines(fileName);
             DrawScreen(fileLines);
-            ColorConsole.WriteLine("1 player", selectedItem == 0 ? ConsoleColor.Yellow : ConsoleColor.DarkGray);
-            ColorConsole.WriteLine("2 players", selectedItem == 1 ? ConsoleColor.Yellow : ConsoleColor.DarkGray);
-            ColorConsole.WriteLine("start net", selectedItem == 2 ? ConsoleColor.Yellow : ConsoleColor.DarkGray);
-            ColorConsole.WriteLine("connect", selectedItem == 3 ? ConsoleColor.Yellow : ConsoleColor.DarkGray);
-            ColorConsole.WriteLine("exit", selectedItem == 4 ? ConsoleColor.Yellow : ConsoleColor.DarkGray);
-            // Console.Write("Нажмите Enter для начала игры или Escape для выхода...");
+            Console.WriteLine();
+
+            var i = 0;
+            foreach (var item in StartMenuHelper.StartMenuItems)
+            {
+                ColorConsole.WriteLine(item.Value, selectedItem == i ? ConsoleColor.Yellow : ConsoleColor.DarkGray);
+                i++;
+            }
         }
 
         public void DrawWin()
@@ -199,11 +201,14 @@ namespace Ira.Game
             Console.Clear();
             ColorConsole.WriteLine("SHOP", ConsoleColor.Cyan);
             Console.WriteLine();
-            ColorConsole.WriteLine("life", selectedItem == 0 ? ConsoleColor.Yellow : ConsoleColor.DarkGray);
-            ColorConsole.WriteLine("bomb count", selectedItem == 1 ? ConsoleColor.Yellow : ConsoleColor.DarkGray);
-            ColorConsole.WriteLine("bomb power", selectedItem == 2 ? ConsoleColor.Yellow : ConsoleColor.DarkGray);
-            ColorConsole.WriteLine("armor", selectedItem == 3 ? ConsoleColor.Yellow : ConsoleColor.DarkGray);
-            ColorConsole.WriteLine("nothing", selectedItem == 4 ? ConsoleColor.Yellow : ConsoleColor.DarkGray);
+
+            var i = 0;
+            foreach (var item in ShopHelper.Prices)
+            {
+                ColorConsole.WriteLine(item.Key.ToTitle() + ": " + item.Value, selectedItem == i ? ConsoleColor.Yellow : ConsoleColor.DarkGray);
+                i++;
+            }
+            
             Console.WriteLine();
             Console.Title =
                 $"{Title} (player position: {player.Position.X} - {player.Position.Y}) Player Score: {player.Score} Player Lives: {player.LivesCount}";

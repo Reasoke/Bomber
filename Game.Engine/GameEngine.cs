@@ -18,16 +18,16 @@ namespace Ira.Game
         private bool singlePlayerGame = true;
         private bool player1Move = true;
         private NetworkConnection socket;
-        private GameStates state;
+        private GameState state;
 
         public GameEngine(IPainter painter)
         {
             this.painter = painter;
-            state = GameStates.Start;
+            state = GameState.Start;
             StartScreen();
         }
 
-        public void ProcessAction(ControllerActions action, bool localEvent = true)
+        public void ProcessAction(ControllerAction action, bool localEvent = true)
         {
             if (socket != null && localEvent)
             {
@@ -37,13 +37,13 @@ namespace Ira.Game
                 {
                     switch (action)
                     {
-                        case ControllerActions.Player2Up:
-                        case ControllerActions.Player2Down:
-                        case ControllerActions.Player2Left:
-                        case ControllerActions.Player2Right:
-                        case ControllerActions.Player2Bomb:
-                        case ControllerActions.Player2Exit:
-                        case ControllerActions.Player2Start:
+                        case ControllerAction.Player2Up:
+                        case ControllerAction.Player2Down:
+                        case ControllerAction.Player2Left:
+                        case ControllerAction.Player2Right:
+                        case ControllerAction.Player2Bomb:
+                        case ControllerAction.Player2Exit:
+                        case ControllerAction.Player2Start:
                             return;
                     }
                 }
@@ -51,13 +51,13 @@ namespace Ira.Game
                 {
                     switch (action)
                     {
-                        case ControllerActions.Player1Up:
-                        case ControllerActions.Player1Down:
-                        case ControllerActions.Player1Left:
-                        case ControllerActions.Player1Right:
-                        case ControllerActions.Player1Bomb:
+                        case ControllerAction.Player1Up:
+                        case ControllerAction.Player1Down:
+                        case ControllerAction.Player1Left:
+                        case ControllerAction.Player1Right:
+                        case ControllerAction.Player1Bomb:
                         // case ControllerActions.Player1Exit:
-                        case ControllerActions.Player1Start:
+                        case ControllerAction.Player1Start:
                             return;
                     }
                 }
@@ -72,40 +72,40 @@ namespace Ira.Game
 
             switch (state)
             {
-                case GameStates.Start:
+                case GameState.Start:
                     ProcessStartScreenActions(action);
                     break;
-                case GameStates.Shop:
+                case GameState.Shop:
                     ProcessShopScreenActions(action);
                     break;
-                case GameStates.Win:
+                case GameState.Win:
                     currentSelectedItem = 0;
-                    if (singlePlayerGame && action == ControllerActions.Player1Start)
+                    if (singlePlayerGame && action == ControllerAction.Player1Start)
                     {
-                        state = GameStates.Shop;
+                        state = GameState.Shop;
                         Shop();
                     }
-                    else
+                    else if(singlePlayerGame && action == ControllerAction.Player1Exit)
                     {
-                        state = GameStates.Start;
+                        state = GameState.Start;
                         StartScreen();
                     }
 
                     break;
-                case GameStates.Lose:
-                    state = GameStates.Start;
+                case GameState.Lose:
+                    state = GameState.Start;
                     currentSelectedItem = 0;
                     StartScreen();
                     break;
-                case GameStates.Game:
+                case GameState.Game:
                     ProcessGameScreenActions(action);
                     break;
-                case GameStates.Loading:
+                case GameState.Loading:
                     switch (action)
                     {
-                        case ControllerActions.Player1Exit:
-                        case ControllerActions.Player2Exit:
-                            state = GameStates.Start;
+                        case ControllerAction.Player1Exit:
+                        case ControllerAction.Player2Exit:
+                            state = GameState.Start;
                             currentSelectedItem = 0;
                             StartScreen();
                             break;
@@ -115,35 +115,35 @@ namespace Ira.Game
             }
         }
 
-        private void ProcessGameScreenActions(ControllerActions action)
+        private void ProcessGameScreenActions(ControllerAction action)
         {
             bool makeMove = false;
             // if (player1Move)
             {
                 switch (action)
                 {
-                    case ControllerActions.Player1Exit:
-                    case ControllerActions.Player2Exit:
-                        state = GameStates.Lose;
+                    case ControllerAction.Player1Exit:
+                    case ControllerAction.Player2Exit:
+                        state = GameState.Lose;
                         StopLevel();
                         return;
-                    case ControllerActions.Player1Up:
+                    case ControllerAction.Player1Up:
                         player1.MoveDirection = MoveDirection.Up;
                         makeMove = true;
                         break;
-                    case ControllerActions.Player1Down:
+                    case ControllerAction.Player1Down:
                         player1.MoveDirection = MoveDirection.Down;
                         makeMove = true;
                         break;
-                    case ControllerActions.Player1Right:
+                    case ControllerAction.Player1Right:
                         player1.MoveDirection = MoveDirection.Right;
                         makeMove = true;
                         break;
-                    case ControllerActions.Player1Left:
+                    case ControllerAction.Player1Left:
                         player1.MoveDirection = MoveDirection.Left;
                         makeMove = true;
                         break;
-                    case ControllerActions.Player1Bomb:
+                    case ControllerAction.Player1Bomb:
                         player1.SetTheBomb(singlePlayerGame ? 6 : 12);
                         makeMove = true;
                         break;
@@ -162,27 +162,27 @@ namespace Ira.Game
                         // StopLevel();
                         // return;
 
-                    case ControllerActions.Player2Up:
+                    case ControllerAction.Player2Up:
                         player2.MoveDirection = MoveDirection.Up;
                         makeMove = true;
                         break;
-                    case ControllerActions.Player2Down:
+                    case ControllerAction.Player2Down:
                         player2.MoveDirection = MoveDirection.Down;
                         makeMove = true;
                         break;
-                    case ControllerActions.Player2Right:
+                    case ControllerAction.Player2Right:
                         player2.MoveDirection = MoveDirection.Right;
                         makeMove = true;
                         break;
-                    case ControllerActions.Player2Left:
+                    case ControllerAction.Player2Left:
                         player2.MoveDirection = MoveDirection.Left;
                         makeMove = true;
                         break;
-                    case ControllerActions.Player2Bomb:
+                    case ControllerAction.Player2Bomb:
                         makeMove = true;
                         player2.SetTheBomb(12);
                         break;
-                    case ControllerActions.Other:
+                    case ControllerAction.Other:
                         makeMove = true;
                         break;
                 }
@@ -193,7 +193,8 @@ namespace Ira.Game
                 return;
             }
 
-            if (player2 != null) player1Move = !player1Move;
+            if (player2 != null) 
+                player1Move = !player1Move;
             MakeMove();
             if (!player1.IsAlive || (player2 != null && !player2.IsAlive))
             {
@@ -202,14 +203,14 @@ namespace Ira.Game
                     var iAmPlayerOne = socket is ServerNetworkConnection;
                     if (iAmPlayerOne && player1.IsAlive || !iAmPlayerOne && !player1.IsAlive)
                     {
-                        state = GameStates.Win;
+                        state = GameState.Win;
                     }
                     else
-                        state = GameStates.Lose;
+                        state = GameState.Lose;
                 }
                 else
                 {
-                    state = GameStates.Lose; //TODO player1/player2 win for multiplayer
+                    state = GameState.Lose;
                 }
 
                 StopLevel();
@@ -218,66 +219,43 @@ namespace Ira.Game
             {
                 Utils.PlaySoundExit();
                 player1.IsWinner = false;
-                state = GameStates.Win;
+                state = GameState.Win;
                 StopLevel();
             }
         }
 
-        private void ProcessShopScreenActions(ControllerActions action)
+        private void ProcessShopScreenActions(ControllerAction action)
         {
             switch (action)
             {
-                case ControllerActions.Player1Exit:
+                case ControllerAction.Player1Exit:
                     Environment.Exit(0);
                     break;
-                case ControllerActions.Player1Up:
+                case ControllerAction.Player1Up:
                     currentSelectedItem--;
                     Shop();
                     break;
-                case ControllerActions.Player1Down:
+                case ControllerAction.Player1Down:
                     currentSelectedItem++;
                     Shop();
                     break;
 
-                case ControllerActions.Player1Start:
+                case ControllerAction.Player1Start:
                     bool restartShop = false;
-                    switch (currentSelectedItem)
+                    var selectedItem = (ShopMenuItem)currentSelectedItem;
+                    switch (selectedItem)
                     {
-                        case 0:
-                            if (player1.Score >= 5)
-                            {
-                                player1.Score -= 5;
-                                player1.AddLife();
-                            }
-                            else restartShop = true;
-
+                        case ShopMenuItem.Life:
+                            ProcessSelectedItem(ShopMenuItem.Life);
                             break;
-                        case 1:
-                            if (player1.Score >= 3)
-                            {
-                                player1.Score -= 3;
-                                player1.AddBomb();
-                            }
-                            else restartShop = true;
-
+                        case ShopMenuItem.BombCountBonus:
+                            ProcessSelectedItem(ShopMenuItem.BombCountBonus);
                             break;
-                        case 2:
-                            if (player1.Score >= 3)
-                            {
-                                player1.Score -= 3;
-                                player1.AddBombPower();
-                            }
-                            else restartShop = true;
-
+                        case ShopMenuItem.BombPowerBonus:
+                            ProcessSelectedItem(ShopMenuItem.BombPowerBonus);
                             break;
-                        case 3:
-                            if (player1.Score >= 4)
-                            {
-                                player1.Score -= 4;
-                                player1.IsProtected = true;
-                            }
-                            else restartShop = true;
-
+                        case ShopMenuItem.Armor:
+                            ProcessSelectedItem(ShopMenuItem.Armor);
                             break;
                     }
 
@@ -285,61 +263,87 @@ namespace Ira.Game
                     {
                         if (currentLevel < 5)
                         {
-                            state = GameStates.Game;
+                            state = GameState.Game;
                             currentLevel++;
                             StartLevel();
                         }
                         else
                         {
                             //no more levels supported
-                            state = GameStates.Start;
+                            state = GameState.Start;
                             StartScreen();
                         }
                     }
                     else Utils.PlaySoundError();
 
                     break;
+                    
+                    void ProcessSelectedItem(ShopMenuItem item)
+                    {
+                        if (player1.Score >= ShopHelper.Prices[item])
+                        {
+                            player1.Score -= ShopHelper.Prices[item];
+                            switch (item)
+                            {
+                                case ShopMenuItem.Life:
+                                    player1.AddLife();
+                                    break;
+                                case ShopMenuItem.BombCountBonus:
+                                    player1.AddBomb();
+                                    break;
+                                case ShopMenuItem.BombPowerBonus:
+                                    player1.AddBombPower();
+                                    break;
+                                case ShopMenuItem.Armor:
+                                    player1.IsProtected = true;
+                                    break;
+                            }
+                        }
+                        else restartShop = true;   
+                    }
             }
+            
         }
 
-        private void ProcessStartScreenActions(ControllerActions action)
+        private void ProcessStartScreenActions(ControllerAction action)
         {
             switch (action)
             {
-                case ControllerActions.Player1Exit:
+                case ControllerAction.Player1Exit:
                     Environment.Exit(0);
                     break;
-                case ControllerActions.Player1Up:
+                case ControllerAction.Player1Up:
                     currentSelectedItem--;
                     StartScreen();
                     break;
-                case ControllerActions.Player1Down:
+                case ControllerAction.Player1Down:
                     currentSelectedItem++;
                     StartScreen();
                     break;
 
-                case ControllerActions.Player1Start:
-                    switch (currentSelectedItem)
+                case ControllerAction.Player1Start:
+                    var selectedItem = (StartMenuItem)currentSelectedItem;
+                    switch (selectedItem)
                     {
-                        case 0:
-                            state = GameStates.Game;
+                        case StartMenuItem.LocalOnePlayer:
+                            state = GameState.Game;
                             singlePlayerGame = true;
                             StartLevel();
                             break;
-                        case 1:
-                            state = GameStates.Game;
+                        case StartMenuItem.LocalTwoPlayers:
+                            state = GameState.Game;
                             singlePlayerGame = false;
                             StartLevel();
                             break;
-                        case 2: //server
-                            state = GameStates.Loading;
+                        case StartMenuItem.StartServer: //server
+                            state = GameState.Loading;
                             StartServer();
                             break;
-                        case 3: //client
-                            state = GameStates.Loading;
+                        case StartMenuItem.Connect: //client
+                            state = GameState.Loading;
                             StartClient();
                             break;
-                        case 4:
+                        case StartMenuItem.Exit:
                             Environment.Exit(0);
                             break;
                     }
@@ -347,7 +351,7 @@ namespace Ira.Game
                     break;
             }
         }
-
+        
         private void StartServer()
         {
             painter.DrawMessageScreen("Waiting...");
@@ -356,9 +360,9 @@ namespace Ira.Game
                 socket = new ServerNetworkConnection();
                 socket.Connect(ProcessConnectingResult, 5 * 60 * 1000);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                painter.DrawMessageScreen(ex.Message);
+                painter.DrawMessageScreen("Error");
             }
         }
 
@@ -370,9 +374,9 @@ namespace Ira.Game
                 socket = new NetworkConnection();
                 socket.Connect(ProcessConnectingResult, 30 * 1000);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                painter.DrawMessageScreen(ex.Message);
+                painter.DrawMessageScreen("Error");
             }
         }
 
@@ -386,7 +390,7 @@ namespace Ira.Game
 
             socket.OnDisconnected += OnSocketDisconnected;
             socket.OnMessageReceived += OnSocketMessage;
-            state = GameStates.Game;
+            state = GameState.Game;
             singlePlayerGame = false;
             StartLevel();
         }
@@ -403,13 +407,13 @@ namespace Ira.Game
         private void OnSocketDisconnected(string error = "Disconnected")
         {
             CloseNetwork();
-            state = GameStates.Loading;
+            state = GameState.Loading;
             painter.DrawMessageScreen(error);
         }
 
         private void OnSocketMessage(string message)
         {
-            if (Enum.TryParse(message, out ControllerActions action))
+            if (Enum.TryParse(message, out ControllerAction action))
             {
                 ProcessAction(action, false);
             }
@@ -418,13 +422,15 @@ namespace Ira.Game
                 //ignore?
             }
         }
-
+        
         private void StartScreen(int level = 0)
         {
             CloseNetwork(); //probably useless, but lets check for sure
 
-            if (currentSelectedItem < 0) currentSelectedItem = 4;
-            if (currentSelectedItem > 4) currentSelectedItem = 0;
+            if (currentSelectedItem < 0) 
+                currentSelectedItem = 4;
+            if (currentSelectedItem > 4) 
+                currentSelectedItem = 0;
             painter.DrawStart(currentSelectedItem);
             Utils.PlaySoundMove();
             currentLevel = level;
@@ -432,18 +438,22 @@ namespace Ira.Game
 
         private void Shop()
         {
-            if (currentSelectedItem < 0) currentSelectedItem = 4;
-            if (currentSelectedItem > 4) currentSelectedItem = 0;
+            if (currentSelectedItem < 0) 
+                currentSelectedItem = 4;
+            if (currentSelectedItem > 4) 
+                currentSelectedItem = 0;
             painter.DrawShop(currentSelectedItem, player1);
             Utils.PlaySoundMove();
         }
 
         private void StartLevel()
         {
-            if (player1 == null) player1 = new Player(1, 1, board, 3);
+            if (player1 == null) 
+                player1 = new Player(1, 1, board, 3);
             if (singlePlayerGame == false)
             {
-                if (player2 == null) player2 = new Player(13, 15, board, 3);
+                if (player2 == null) 
+                    player2 = new Player(13, 15, board, 3);
                 player1.AddBomb(2);
                 player2.AddBomb(2);
             }
@@ -457,7 +467,7 @@ namespace Ira.Game
         private void StopLevel()
         {
             Utils.StopMainTheme();
-            if (state == GameStates.Win)
+            if (state == GameState.Win)
             {
                 painter.DrawWin();
             }
@@ -473,7 +483,8 @@ namespace Ira.Game
         {
             //game logic
             player1.Move();
-            if (player2 != null) player2.Move();
+            if (player2 != null) 
+                player2.Move();
             foreach (var e in enemies)
             {
                 e.Move();
@@ -487,7 +498,8 @@ namespace Ira.Game
             }
 
             player1.InteractWithBoard(enemies);
-            if (player2 != null) player2.InteractWithBoard(enemies);
+            if (player2 != null) 
+                player2.InteractWithBoard(enemies);
 
             painter.DrawBoard(board, player1, player2, enemies, player1Move);
         }

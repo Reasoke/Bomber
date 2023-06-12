@@ -30,7 +30,7 @@ namespace Ira.Game
             get { return LivesCount > 0; }
         }
 
-        public Character(int x, int y, GameBoard board, int lives = 1) : base()
+        public Character(int x, int y, GameBoard board, int lives = 1)
         {
             this.Position = new Point(x, y);
             this.LivesCount = lives;

@@ -1,6 +1,6 @@
 ﻿namespace Ira.Game
 {
-    public enum GameStates
+    public enum GameState
     {
         Start,
         Game,
